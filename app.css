@@ -37,6 +37,18 @@ body > * { position:relative; z-index:1; }
 .tabs a { color:var(--dim); text-decoration:none; font-weight:700; font-size:14px; padding:8px 14px; border-radius:999px; border:1px solid transparent; }
 .tabs a:hover { color:var(--text); border-color:var(--line); }
 .tabs a.on { color:#0b1426; background:var(--ball); }
+.tabs a span { margin-right:6px; }
+/* телефон: вкладки — нижняя панель под большой палец */
+@media (max-width:700px){
+  body { padding-bottom:calc(70px + env(safe-area-inset-bottom)); }
+  .top { padding:10px 14px; position:static; backdrop-filter:none; background:transparent; }
+  .tabs { position:fixed; left:0; right:0; bottom:0; z-index:50; margin:0; gap:0; flex-wrap:nowrap; justify-content:space-around;
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom)); background:rgba(8,17,31,.94); backdrop-filter:blur(10px); border-top:1px solid var(--line); }
+  .tabs a { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 2px; font-size:11px; border-radius:12px; }
+  .tabs a span { margin:0; font-size:21px; line-height:1; }
+  .tabs a.on { color:var(--ball); background:rgba(215,242,5,.1); }
+  body.boardOnly { padding-bottom:0; }
+}
 
 .wrap { display:grid; grid-template-columns:minmax(300px, 430px) 1fr; gap:20px; padding:20px; max-width:1360px; margin:0 auto; }
 @media (max-width:900px){ .wrap { grid-template-columns:1fr; } .board { order:-1; } }

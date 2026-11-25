@@ -22,7 +22,7 @@
 <body>
 <nav class="top">
   <div class="logo"><span class="dot"></span>ПАДЕЛ</div>
-  <div class="tabs"><a href="score.html" class="on">Счёт матча</a><a href="tournament.html">Турнир</a><a href="index.html">Комикс и тактика</a></div>
+  <div class="tabs"><a href="academy.html"><span>🎓</span>Академия</a><a href="quiz.html"><span>🧠</span>Тест</a><a href="score.html" class="on"><span>🎾</span>Счёт</a><a href="tournament.html"><span>🏆</span>Турнир</a><a href="index.html"><span>📖</span>Комикс</a></div>
 </nav>
 <div class="wrap">
   <div class="control">
@@ -54,6 +54,7 @@
         <button id="undoBtn">↶ Отменить</button>
         <button id="winBtn">Табло в окне</button>
         <button id="newBtn">Новый матч</button>
+        <button id="voiceBtn"></button>
       </div>
     </div>
     <div class="box rules" id="rules"></div>
@@ -67,6 +68,7 @@
   </div>
 </div>
 
+<script src="voice.js"></script>
 <script>
 const MODES = {
   long:  { name:'Длинная', sub:'С преимуществом — как в теннисе',
@@ -300,6 +302,22 @@ function drawCourt(info) {
   $('court').innerHTML = g;
 }
 
+// ---------- озвучка: счёт подающих первым, как говорят на корте ----------
+const WORD = ['ноль', 'пятнадцать', 'тридцать', 'сорок'];
+function announce() {
+  if (!s) return;
+  if (s.over || needChoice(s)) return Voice.say(s.over ? s.notice : (s.notice ? s.notice + ' ' : '') + 'Решающий мяч. Принимающие выбирают поле.');
+  const [st, sp] = server(s), [a, b] = [s.pts[st], s.pts[1 - st]];
+  let say;
+  if (s.fault) say = 'Ошибка. Вторая подача.';
+  else if (s.tb) say = `${a} — ${b}`;
+  else if (a >= 3 && b >= 3) say = a !== b ? `Больше у ${teamName(a > b ? st : 1 - st)}` : decisive(s) ? (s.cfg.mode === 'star' ? 'Стар пойнт' : 'Золотой мяч') : 'Ровно';
+  else if (a + b === 0) say = `Геймы ${s.games[st]} — ${s.games[1 - st]}. Подаёт ${s.cfg.names[st][sp]}`;
+  else say = a === b ? `${WORD[a]} все` : `${WORD[a]} — ${WORD[b]}`;
+  Voice.say((s.notice && !s.fault ? s.notice.replace(/[^.!]$/, '$&.') + ' ' : '') + say);
+}
+const voiceBtn = () => $('voiceBtn').textContent = Voice.on ? '🔊 Голос' : '🔇 Голос';
+
 // ---------- сохранение / синхронизация окон ----------
 function save() { localStorage.setItem(KEY, JSON.stringify({ s, hist, cfg })); render(); }
 function load() {
@@ -332,16 +350,18 @@ $('setup').onclick = e => {
 };
 $('superTB').onchange = e => { cfg.superTB = e.target.checked; renderRules(); };
 $('startBtn').onclick = () => { readNames(); cfg.superTB = $('superTB').checked; s = fresh(JSON.parse(JSON.stringify(cfg))); hist = []; save(); };
-document.querySelectorAll('.teamBtn').forEach(b => b.onclick = () => point(+b.dataset.team));
-$('faultBtn').onclick = fault;
-$('choice').onclick = e => { const b = e.target.closest('[data-side]'); if (b) { hist.push(JSON.stringify(s)); s.choice = b.dataset.side; s.notice = ''; save(); } };
+document.querySelectorAll('.teamBtn').forEach(b => b.onclick = () => { point(+b.dataset.team); announce(); });
+$('faultBtn').onclick = () => { fault(); announce(); };
+$('choice').onclick = e => { const b = e.target.closest('[data-side]'); if (b) { hist.push(JSON.stringify(s)); s.choice = b.dataset.side; s.notice = ''; save(); Voice.say(`Подача в ${s.choice === 'R' ? 'правое' : 'левое'} поле`); } };
 $('undoBtn').onclick = () => { if (hist.length) { s = JSON.parse(hist.pop()); save(); } };
 $('newBtn').onclick = () => { if (!s || s.over || confirm('Закончить текущий матч и начать новый?')) { s = null; hist = []; renderSetup(); save(); } };
+$('voiceBtn').onclick = () => { Voice.on = !Voice.on; voiceBtn(); if (Voice.on) announce(); };
 $('winBtn').onclick = () => window.open(location.pathname + '#board', 'padel-board', 'width=900,height=700');
 
 load();
 renderSetup();
 render();
+voiceBtn();
 </script>
 </body>
 </html>
