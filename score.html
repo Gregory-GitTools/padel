@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Падел — счёт</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&family=Rubik+Mono+One&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1b1b1f; --paper:#fffaf0; --cap:#ffe45c; --a:#2f6fed; --b:#e5484d; --ball:#d7f205; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#f1e9d8; color:var(--ink); font-family:Rubik, system-ui, sans-serif; }
+  header { display:flex; align-items:center; gap:14px; padding:12px 18px; border-bottom:3px solid var(--ink); }
+  header h1 { font-family:"Rubik Mono One", Rubik, sans-serif; font-size:22px; margin:0; }
+  header a { margin-left:auto; color:var(--ink); font-weight:600; }
+  .wrap { display:grid; grid-template-columns:minmax(300px, 420px) 1fr; gap:18px; padding:18px; max-width:1300px; margin:0 auto; }
+  @media (max-width:860px){ .wrap { grid-template-columns:1fr; } .board { order:-1; } }
+  .box { background:#fff; border:3px solid var(--ink); box-shadow:5px 5px 0 var(--ink); padding:14px; }
+  .box h2 { margin:0 0 10px; font-size:17px; }
+  button { font-family:inherit; cursor:pointer; border:3px solid var(--ink); background:#fff; color:var(--ink); font-weight:800;
+           box-shadow:3px 3px 0 var(--ink); border-radius:10px; }
+  button:active { transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink); }
+  button:disabled { opacity:.35; cursor:not-allowed; }
+  .modes { display:grid; gap:8px; }
+  .mode { text-align:left; padding:10px 12px; font-size:16px; }
+  .mode small { display:block; font-weight:400; font-size:13px; margin-top:3px; }
+  .mode.on { background:var(--cap); }
+  label { display:block; font-size:14px; margin:10px 0 4px; font-weight:600; }
+  .names { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  input[type=text] { width:100%; font:inherit; padding:7px 9px; border:2px solid var(--ink); border-radius:8px; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .seg button { padding:6px 12px; font-size:14px; }
+  .seg button.on { background:var(--cap); }
+  .start { width:100%; margin-top:14px; padding:14px; font-size:18px; background:var(--cap); }
+  .teamBtn { width:100%; padding:22px 10px; font-size:22px; color:#fff; margin-bottom:12px; }
+  .teamBtn small { display:block; font-size:14px; font-weight:600; opacity:.9; margin-top:4px; }
+  .teamBtn.a { background:var(--a); } .teamBtn.b { background:var(--b); }
+  .tools { display:flex; gap:8px; }
+  .tools button { flex:1; padding:10px 6px; font-size:14px; }
+  .choice { background:#fff4c2; border:3px dashed var(--ink); border-radius:10px; padding:12px; margin-bottom:12px; }
+  .choice p { margin:0 0 8px; font-weight:600; }
+  .choice .row button { flex:1; padding:12px 6px; font-size:15px; background:var(--cap); }
+  .rules { margin-top:16px; font-size:14px; line-height:1.45; }
+  .rules ul { margin:6px 0 0; padding-left:18px; }
+  /* табло */
+  .board { display:flex; flex-direction:column; gap:14px; }
+  table.sb { width:100%; border-collapse:collapse; background:var(--ink); color:#fff; font-size:clamp(18px, 3vw, 30px); }
+  .sb td, .sb th { padding:8px 12px; text-align:center; border:1px solid #444; }
+  .sb th { font-size:13px; font-weight:600; color:#bbb; }
+  .sb td.name { text-align:left; font-weight:800; white-space:nowrap; }
+  .sb td.name i { display:inline-block; width:14px; height:14px; border-radius:50%; margin-right:8px; vertical-align:1px; }
+  .sb td.pts { background:var(--cap); color:var(--ink); font-family:"Rubik Mono One", Rubik; min-width:80px; }
+  .sb td.games { font-family:"Rubik Mono One", Rubik; }
+  .sb td.set { color:#ccc; } .sb td.set.won { color:#fff; font-weight:800; }
+  .sb sup { font-size:.5em; color:#bbb; }
+  .serveBall { display:inline-block; width:16px; height:16px; border-radius:50%; background:var(--ball); border:2px solid #fff; margin-left:8px; vertical-align:2px; }
+  .status { background:var(--cap); border:3px solid var(--ink); padding:10px 14px; font-size:clamp(16px, 2.2vw, 22px); font-weight:800; text-align:center; }
+  .status small { display:block; font-weight:600; font-size:.7em; margin-top:2px; }
+  .notice { background:var(--b); color:#fff; border:3px solid var(--ink); padding:10px 14px; font-weight:800; text-align:center; font-size:20px; }
+  .court svg { display:block; width:100%; height:auto; background:#3f8f5a; border:3px solid var(--ink); }
+  .hidden { display:none !important; }
+  body.boardOnly header, body.boardOnly .control { display:none; }
+  body.boardOnly .wrap { grid-template-columns:1fr; }
+</style>
+</head>
+<body>
+<header><h1>ПАДЕЛ · СЧЁТ</h1><a href="index.html">← Комикс и тактика</a></header>
+<div class="wrap">
+  <div class="control">
+    <!-- Настройка матча -->
+    <div class="box" id="setup">
+      <h2>1. Правила счёта</h2>
+      <div class="modes" id="modes"></div>
+      <label><input type="checkbox" id="superTB"> 3-й сет — супер-тай-брейк до 10</label>
+      <h2 style="margin-top:16px">2. Игроки</h2>
+      <div class="names">
+        <input type="text" id="a0" value="Синий 1"><input type="text" id="b0" value="Красный 1">
+        <input type="text" id="a1" value="Синий 2"><input type="text" id="b1" value="Красный 2">
+      </div>
+      <label>Первым подаёт</label>
+      <div class="row seg" id="firstSrv"></div>
+      <button class="start" id="startBtn">Начать матч</button>
+    </div>
+    <!-- Ведение счёта -->
+    <div class="box hidden" id="play">
+      <div class="choice hidden" id="choice">
+        <p id="choiceText"></p>
+        <div class="row"><button data-side="L">Левое поле</button><button data-side="R">Правое поле</button></div>
+      </div>
+      <button class="teamBtn a" data-team="0"><span id="btnA"></span><small>выиграла мяч</small></button>
+      <button class="teamBtn b" data-team="1"><span id="btnB"></span><small>выиграла мяч</small></button>
+      <div class="tools">
+        <button id="undoBtn">↶ Отменить</button>
+        <button id="winBtn">Табло в окне</button>
+        <button id="newBtn">Новый матч</button>
+      </div>
+    </div>
+    <div class="box rules" id="rules"></div>
+  </div>
+  <div class="board">
+    <table class="sb" id="sb"></table>
+    <div class="status" id="status"></div>
+    <div class="notice hidden" id="notice"></div>
+    <div class="court"><svg viewBox="0 0 440 250" id="court"></svg></div>
+  </div>
+</div>
+
+<script>
+const MODES = {
+  long:  { name:'Длинная', sub:'С преимуществом — как в теннисе',
+           rules:['Очки: 0 → 15 → 30 → 40 → гейм.','При 40:40 («ровно») нужно выиграть два мяча подряд: «больше» → гейм.','Гейм может длиться сколько угодно.'] },
+  short: { name:'Короткая', sub:'Золотой мяч при 40:40',
+           rules:['Очки: 0 → 15 → 30 → 40 → гейм.','При 40:40 играется один решающий мяч — кто выиграл, тот взял гейм.','Принимающая команда сама выбирает, на какое поле (левое или правое) будет подача.'] },
+  star:  { name:'Новые правила', sub:'Star Point (FIP / Premier Padel, с 2026)',
+           rules:['Очки: 0 → 15 → 30 → 40 → гейм.','При 40:40 играются «больше», как в длинной системе — но не бесконечно.','Если счёт в третий раз стал 40:40 — решающий мяч (Star Point).','На решающем мяче принимающие выбирают поле, как при золотом мяче.'] },
+};
+const COMMON = ['Сет — до 6 геймов с разницей в 2. При 6:6 — тай-брейк до 7 (разница 2).','Матч — до двух выигранных сетов.',
+  'Подача: первый мяч гейма — с правого поля, дальше поля чередуются каждый мяч. Подаёт по диагонали.',
+  'Подающие меняются каждый гейм: команда 1 → команда 2 → партнёр из команды 1 → партнёр из команды 2.',
+  'Смена сторон — после каждого нечётного гейма в сете (1, 3, 5…), в тай-брейке — каждые 6 очков.',
+  'Тай-брейк: первый мяч подаёт один игрок с правого поля, дальше каждый следующий подаёт по 2 мяча (сначала с левого).'];
+
+const KEY = 'padel-score-v1';
+const $ = id => document.getElementById(id);
+let cfg = { mode:'short', superTB:false, first:0, names:[['Синий 1','Синий 2'],['Красный 1','Красный 2']] };
+let s = null;        // состояние матча
+let hist = [];       // для «Отменить»
+const boardOnly = location.hash === '#board';
+if (boardOnly) document.body.classList.add('boardOnly');
+
+// ---------- логика счёта ----------
+function fresh(c) {
+  return { cfg:c, sets:[], games:[0,0], pts:[0,0], deuces:0, tb:false, tbTarget:7, superSet:false,
+           serveIdx:0, swapped:false, choice:null, over:null, notice:'' };
+}
+// очередность подачи: [команда, игрок]
+const order = st => st.cfg.first === 0 ? [[0,0],[1,0],[0,1],[1,1]] : [[1,0],[0,0],[1,1],[0,1]];
+function server(st) {
+  const n = st.pts[0] + st.pts[1];
+  const k = st.tb ? (n === 0 ? 0 : Math.floor((n + 1) / 2)) : 0;
+  return order(st)[(st.serveIdx + k) % 4];
+}
+const sideOf = st => st.choice || ((st.pts[0] + st.pts[1]) % 2 === 0 ? 'R' : 'L');
+function decisive(st) {
+  if (st.tb || st.pts[0] !== st.pts[1] || st.pts[0] < 3) return false;
+  return st.cfg.mode === 'short' || (st.cfg.mode === 'star' && st.deuces >= 3);
+}
+const needChoice = st => !st.over && decisive(st) && !st.choice;
+const setsWon = (st, t) => st.sets.filter(x => x.w === t).length;
+
+function point(t) {
+  if (!s || s.over || needChoice(s)) return;
+  hist.push(JSON.stringify(s));
+  s.notice = '';
+  const o = 1 - t;
+  if (s.tb) {
+    s.pts[t]++;
+    if (s.pts[t] >= s.tbTarget && s.pts[t] - s.pts[o] >= 2) {
+      if (!s.superSet) s.games[t]++;
+      return winSet(t);
+    }
+    if ((s.pts[0] + s.pts[1]) % 6 === 0) { s.swapped = !s.swapped; s.notice = 'Смена сторон!'; }
+    return save();
+  }
+  if (decisive(s)) return winGame(t);
+  s.pts[t]++;
+  if (s.pts[t] >= 4 && s.pts[t] - s.pts[o] >= 2) return winGame(t);
+  if (s.pts[0] === s.pts[1] && s.pts[0] >= 3) s.deuces++;
+  save();
+}
+function winGame(t) {
+  const o = 1 - t;
+  s.games[t]++; s.pts = [0,0]; s.deuces = 0; s.choice = null; s.serveIdx++;
+  const g = s.games;
+  if ((g[t] >= 6 && g[t] - g[o] >= 2) || g[t] === 7) return winSet(t);
+  if ((g[0] + g[1]) % 2 === 1) { s.swapped = !s.swapped; s.notice = 'Смена сторон!'; }
+  if (g[0] === 6 && g[1] === 6) { s.tb = true; s.tbTarget = 7; s.notice = 'Тай-брейк до 7!'; }
+  save();
+}
+function winSet(t) {
+  s.sets.push({ g:[...s.games], tb: s.tb ? [...s.pts] : null, sup: s.superSet, w:t });
+  const odd = (s.games[0] + s.games[1]) % 2 === 1 || s.tb;
+  if (s.tb) s.serveIdx++;                    // тай-брейк считается как гейм для очерёдности подачи
+  s.games = [0,0]; s.pts = [0,0]; s.deuces = 0; s.tb = false; s.superSet = false; s.choice = null;
+  if (odd) s.swapped = !s.swapped;
+  const name = teamName(t);
+  if (setsWon(s, t) === 2) { s.over = { w:t }; s.notice = `Матч! Победа: ${name}`; return save(); }
+  s.notice = `Сет — ${name}!` + (odd ? ' Смена сторон.' : '');
+  if (s.cfg.superTB && s.sets.length === 2) { s.tb = true; s.tbTarget = 10; s.superSet = true; s.notice += ' Супер-тай-брейк до 10.'; }
+  save();
+}
+
+// ---------- отображение ----------
+const teamName = t => (s ? s.cfg : cfg).names[t].join(' / ');
+const short = n => n.length > 9 ? n.slice(0, 8) + '…' : n;
+function ptsLabel(t) {
+  if (s.tb) return s.pts[t];
+  const [a, b] = [s.pts[t], s.pts[1 - t]];
+  if (a >= 3 && b >= 3) return a === b ? '40' : (a > b ? 'AD' : '40');
+  return ['0','15','30','40'][a];
+}
+function render() {
+  const live = !!s;
+  $('setup').classList.toggle('hidden', live);
+  $('play').classList.toggle('hidden', !live);
+  renderRules();
+  if (!live) { $('sb').innerHTML = ''; $('status').textContent = 'Выберите правила и начните матч'; $('notice').classList.add('hidden'); drawCourt(null); return; }
+  $('btnA').textContent = teamName(0);
+  $('btnB').textContent = teamName(1);
+  const srv = server(s);
+  // табло
+  const nSets = Math.max(s.sets.length + (s.over ? 0 : 1), 1);
+  let h = '<tr><th></th>';
+  for (let i = 0; i < s.sets.length; i++) h += `<th>Сет ${i + 1}</th>`;
+  if (!s.over) h += `<th>${s.superSet ? 'Супер-ТБ' : 'Геймы'}</th><th>${s.tb ? 'Тай-брейк' : 'Очки'}</th>`;
+  h += '</tr>';
+  for (const t of [0, 1]) {
+    h += `<tr><td class="name"><i style="background:${t ? 'var(--b)' : 'var(--a)'}"></i>${teamName(t)}${!s.over && srv[0] === t ? '<span class="serveBall" title="подаёт"></span>' : ''}</td>`;
+    for (const st of s.sets) {
+      const v = st.sup ? st.tb[t] : st.g[t];
+      h += `<td class="set ${st.w === t ? 'won' : ''}">${v}${st.tb && !st.sup ? `<sup>${st.tb[t]}</sup>` : ''}</td>`;
+    }
+    if (!s.over) h += `<td class="games">${s.superSet ? '' : s.games[t]}</td><td class="pts">${ptsLabel(t)}</td>`;
+    h += '</tr>';
+  }
+  $('sb').innerHTML = h;
+  // статус
+  const side = sideOf(s);
+  const recvTeam = 1 - srv[0];
+  let st;
+  if (s.over) st = `🏆 Матч окончен. Победа: ${teamName(s.over.w)}`;
+  else if (needChoice(s)) st = `Решающий мяч! ${teamName(recvTeam)} выбирает поле приёма<small>Подаёт ${s.cfg.names[srv[0]][srv[1]]}</small>`;
+  else {
+    let tag = '';
+    if (!s.tb && s.pts[0] === s.pts[1] && s.pts[0] >= 3) tag = decisive(s) ? (s.cfg.mode === 'star' ? ' · STAR POINT' : ' · ЗОЛОТОЙ МЯЧ') : ` · Ровно${s.cfg.mode === 'star' ? ` (${s.deuces}-е из 3)` : ''}`;
+    st = `Подаёт ${s.cfg.names[srv[0]][srv[1]]} — с ${side === 'R' ? 'ПРАВОГО' : 'ЛЕВОГО'} поля${tag}<small>по диагонали, в ${side === 'R' ? 'правое' : 'левое'} поле соперника</small>`;
+  }
+  $('status').innerHTML = st;
+  $('notice').textContent = s.notice;
+  $('notice').classList.toggle('hidden', !s.notice);
+  // выбор поля
+  const ch = needChoice(s);
+  $('choice').classList.toggle('hidden', !ch);
+  if (ch) $('choiceText').textContent = `Решающий мяч. Команда «${teamName(recvTeam)}» выбирает, на какое поле принимать подачу:`;
+  document.querySelectorAll('.teamBtn').forEach(b => b.disabled = ch || !!s.over);
+  $('undoBtn').disabled = !hist.length;
+  drawCourt(s.over ? null : { srv, side, pending: ch });
+}
+
+function renderRules() {
+  const m = MODES[(s ? s.cfg : cfg).mode];
+  $('rules').innerHTML = `<h2>Правила: ${m.name}</h2><ul>${m.rules.map(r => `<li>${r}</li>`).join('')}</ul>
+    <h2 style="margin-top:12px">Для всех вариантов</h2><ul>${COMMON.map(r => `<li>${r}</li>`).join('')}</ul>`;
+}
+
+// корт сверху: 20 × 10 м, 20 px = 1 м
+function drawCourt(info) {
+  const X0 = 20, Y0 = 25, W = 400, H = 200, NET = 220, SL = 139;
+  let g = `<rect x="${X0}" y="${Y0}" width="${W}" height="${H}" fill="#2f7de1" stroke="#cfe8ff" stroke-width="5"/>`;
+  g += `<path d="M${NET - SL} ${Y0} V${Y0 + H} M${NET + SL} ${Y0} V${Y0 + H} M${NET - SL} ${Y0 + H / 2} H${NET + SL}" stroke="#fff" stroke-width="2"/>`;
+  g += `<path d="M${NET} ${Y0 - 6} V${Y0 + H + 6}" stroke="#fff" stroke-width="5"/>`;
+  const cfgN = (s ? s.cfg : cfg).names;
+  const leftTeam = s && s.swapped ? 1 : 0;
+  const col = t => t ? '#e5484d' : '#2f6fed';
+  const lab = (x, y, t) => `<text x="${x}" y="${y}" text-anchor="middle" font-size="12" font-weight="800" fill="#fff" stroke="#1b1b1f" stroke-width=".4">${t}</text>`;
+  g += lab(X0 + 100, 16, teamName(leftTeam)) + lab(X0 + 300, 16, teamName(1 - leftTeam));
+  const pl = (x, y, t, name, hl) => `<circle cx="${x}" cy="${y}" r="${hl ? 14 : 11}" fill="${col(t)}" stroke="${hl ? '#d7f205' : '#1b1b1f'}" stroke-width="${hl ? 5 : 2.5}"/>` +
+    `<text x="${x}" y="${y + (y > Y0 + H / 2 ? 30 : -20)}" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">${short(name)}</text>`;
+  if (!info) {
+    g += pl(140, 75, leftTeam, cfgN[leftTeam][0]) + pl(140, 175, leftTeam, cfgN[leftTeam][1]);
+    g += pl(300, 75, 1 - leftTeam, cfgN[1 - leftTeam][0]) + pl(300, 175, 1 - leftTeam, cfgN[1 - leftTeam][1]);
+    $('court').innerHTML = g; return;
+  }
+  const [st, sp] = info.srv, rt = 1 - st;
+  const srvLeft = st === leftTeam;
+  // смотрим вдоль корта: для команды слева «правое» поле — нижняя половина, для команды справа — верхняя
+  const srvBottom = srvLeft ? info.side === 'R' : info.side === 'L';
+  const yS = srvBottom ? Y0 + 150 : Y0 + 50, yO = srvBottom ? Y0 + 50 : Y0 + 150;
+  const yR = yO;                                   // приём — по диагонали
+  const xS = srvLeft ? X0 + 8 : X0 + W - 8, xSp = srvLeft ? NET - 55 : NET + 55;
+  const xR = srvLeft ? X0 + W - 30 : X0 + 30, xRp = srvLeft ? NET + 110 : NET - 110;
+  const bx = srvLeft ? NET : NET - SL;
+  if (!info.pending) {
+  g += `<rect x="${bx}" y="${yR - 50}" width="${SL}" height="100" fill="#d7f205" opacity=".45"/>`;
+  g += `<text x="${bx + SL / 2}" y="${yR + 4}" text-anchor="middle" font-size="13" font-weight="800" fill="#1b1b1f">сюда подача</text>`;
+  g += `<path d="M${xS + (srvLeft ? 14 : -14)} ${yS} Q${NET} ${(yS + yR) / 2 - 10} ${srvLeft ? NET + SL - 30 : NET - SL + 30} ${yR}" fill="none" stroke="#d7f205" stroke-width="3" stroke-dasharray="7 5"/>`;
+  }
+  g += pl(xS, yS, st, cfgN[st][sp], true) + pl(xSp, yO, st, cfgN[st][1 - sp]);
+  g += pl(xR, yR, rt, 'приём') + pl(xRp, yS, rt, '');
+  $('court').innerHTML = g;
+}
+
+// ---------- сохранение / синхронизация окон ----------
+function save() { localStorage.setItem(KEY, JSON.stringify({ s, hist, cfg })); render(); }
+function load() {
+  try { const d = JSON.parse(localStorage.getItem(KEY)); if (d) { s = d.s; hist = d.hist || []; cfg = d.cfg || cfg; } } catch (e) {}
+}
+window.addEventListener('storage', e => { if (e.key === KEY) { load(); render(); } });
+
+// ---------- настройка ----------
+function renderSetup() {
+  $('modes').innerHTML = Object.entries(MODES).map(([k, m]) =>
+    `<button class="mode ${cfg.mode === k ? 'on' : ''}" data-mode="${k}">${m.name}<small>${m.sub}</small></button>`).join('');
+  $('firstSrv').innerHTML = [0, 1].map(t => `<button class="${cfg.first === t ? 'on' : ''}" data-first="${t}">${t ? 'Красные' : 'Синие'}</button>`).join('');
+  $('superTB').checked = cfg.superTB;
+  ['a0','a1','b0','b1'].forEach(id => $(id).value = cfg.names[id[0] === 'a' ? 0 : 1][+id[1]]);
+}
+function readNames() {
+  cfg.names = [[$('a0').value.trim() || 'Синий 1', $('a1').value.trim() || 'Синий 2'], [$('b0').value.trim() || 'Красный 1', $('b1').value.trim() || 'Красный 2']];
+}
+$('modes').onclick = e => { const b = e.target.closest('[data-mode]'); if (b) { readNames(); cfg.mode = b.dataset.mode; renderSetup(); renderRules(); } };
+$('firstSrv').onclick = e => { const b = e.target.closest('[data-first]'); if (b) { readNames(); cfg.first = +b.dataset.first; renderSetup(); } };
+$('superTB').onchange = e => cfg.superTB = e.target.checked;
+$('startBtn').onclick = () => { readNames(); cfg.superTB = $('superTB').checked; s = fresh(JSON.parse(JSON.stringify(cfg))); hist = []; save(); };
+document.querySelectorAll('.teamBtn').forEach(b => b.onclick = () => point(+b.dataset.team));
+$('choice').onclick = e => { const b = e.target.closest('[data-side]'); if (b) { hist.push(JSON.stringify(s)); s.choice = b.dataset.side; s.notice = ''; save(); } };
+$('undoBtn').onclick = () => { if (hist.length) { s = JSON.parse(hist.pop()); save(); } };
+$('newBtn').onclick = () => { if (!s || s.over || confirm('Закончить текущий матч и начать новый?')) { s = null; hist = []; renderSetup(); save(); } };
+$('winBtn').onclick = () => window.open(location.pathname + '#board', 'padel-board', 'width=900,height=650');
+
+load();
+renderSetup();
+render();
+</script>
+</body>
+</html>

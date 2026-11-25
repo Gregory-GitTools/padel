@@ -344,7 +344,7 @@ SHOTS.forEach(sh => {
     <div class="notes"><div class="card"><h4>Техника</h4><ul>${sh.tech.map(t => `<li>${t}</li>`).join('')}</ul></div>
     <div class="card err"><h4>Частые ошибки</h4><ul>${sh.err.map(t => `<li>${t}</li>`).join('')}</ul></div></div></section>`);
 });
-nav.insertAdjacentHTML('beforeend', `<a href="#tactics">⭐ Тактика</a><a href="#drills">Тренировка</a><a href="#github">GitHub</a>`);
+nav.insertAdjacentHTML('beforeend', `<a href="#tactics">⭐ Тактика</a><a href="#drills">Тренировка</a><a href="#github">GitHub</a><a href="score.html">🎾 Счётчик</a>`);
 
 // --- тактические схемы: корт сверху, 20 px = 1 м ---
 const CX = x => 10 + x, CY = y => 15 + y;
