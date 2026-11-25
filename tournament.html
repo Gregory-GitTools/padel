@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Падел — турнир Американо / Мексикано</title>
+<link rel="stylesheet" href="app.css">
+<style>
+  .wrap.t { grid-template-columns:minmax(300px, 400px) 1fr; }
+  .plist { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .plist input { font-size:14px; }
+  .plist .pairLbl { grid-column:1 / -1; font-size:12px; color:var(--dim); font-weight:800; margin-top:4px; }
+  .actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; }
+  .actions button { padding:11px 14px; font-size:14px; }
+  .next { padding:13px 18px; font-size:15px; }
+  .hint { color:var(--dim); font-size:13.5px; margin-top:8px; line-height:1.45; }
+  .champ { text-align:center; font-family:Unbounded; font-size:22px; padding:18px; border-radius:var(--r);
+           background:linear-gradient(135deg, rgba(245,197,24,.25), rgba(245,197,24,.05)); border:1px solid rgba(245,197,24,.6); }
+</style>
+</head>
+<body>
+<nav class="top">
+  <div class="logo"><span class="dot"></span>ПАДЕЛ</div>
+  <div class="tabs"><a href="score.html">Счёт матча</a><a href="tournament.html" class="on">Турнир</a><a href="index.html">Комикс и тактика</a></div>
+</nav>
+<div class="wrap t">
+  <div class="control">
+    <div class="box" id="setup">
+      <h2>Формат</h2>
+      <div class="cards" id="formats"></div>
+      <h2 id="countLbl">Игроков</h2>
+      <div class="seg" id="counts"></div>
+      <div id="roundsWrap"><h2>Раундов</h2><div class="seg" id="roundsSeg"></div></div>
+      <h2>Счёт в матче</h2>
+      <div class="cards two" id="scoring"></div>
+      <div class="seg" id="scoreVal" style="margin-top:10px"></div>
+      <h2 id="namesLbl">Имена</h2>
+      <div class="plist" id="plist"></div>
+      <label class="chk"><input type="checkbox" id="shuffle"> Перемешать игроков перед стартом</label>
+      <button class="start primary" id="startBtn">Начать турнир</button>
+    </div>
+    <div class="box rules" id="rules"></div>
+  </div>
+
+  <div class="board" id="board">
+    <div class="box hidden" id="timerBox">
+      <div class="timer">
+        <div class="clock" id="clock">00:00</div>
+        <button class="primary" id="tStart">▶ Старт</button>
+        <button id="tReset">↺ Сброс</button>
+      </div>
+    </div>
+    <div class="box hidden" id="roundBox">
+      <div class="roundHead">
+        <h3 id="roundTitle"></h3>
+        <div class="rounds" id="roundTabs"></div>
+      </div>
+      <div class="matches" id="matches" style="margin-top:14px"></div>
+      <div class="actions">
+        <button class="primary next" id="nextBtn"></button>
+        <button id="copyBtn">Скопировать таблицу</button>
+        <button id="newBtn">Новый турнир</button>
+      </div>
+    </div>
+    <div class="champ hidden" id="champ"></div>
+    <div class="box hidden" id="standBox"><h2>Таблица</h2><table class="stand" id="stand"></table></div>
+    <div class="box" id="ideasBox"><h2>Ещё форматы и правила счёта</h2><div class="ideas" id="ideas"></div></div>
+  </div>
+</div>
+
+<script>
+const FORMATS = {
+  americano: { name:'Американо', sub:'Каждый раунд — новый партнёр', unit:'Игроков', counts:[4,8,12,16], def:8,
+    rules:['Индивидуальный зачёт: каждый играет с каждым в паре ровно один раз и против каждого — ровно два раза.',
+           '8 игроков → 7 раундов на 2 кортах. 12 → 11 раундов на 3 кортах, 16 → 15 на 4.',
+           'Каждый игрок получает в таблицу столько очков, сколько набрала его пара в матче.',
+           'Место: сумма очков → больше побед → лучше разница.'] },
+  mexicano:  { name:'Мексикано', sub:'Пары по таблице — сильные с сильными', unit:'Игроков', counts:[4,8,12,16], def:8,
+    rules:['Первый раунд — по порядку списка. Дальше пары составляются по текущей таблице.',
+           'В каждой четвёрке по таблице: 1-й + 3-й против 2-го + 4-го. Лидеры играют на корте 1.',
+           'Следующий раунд появляется, только когда внесены все счета текущего.',
+           'Очки — как в Американо: каждому игроку идёт счёт его пары.'] },
+  team:      { name:'Командное американо', sub:'Постоянные пары, круговая система', unit:'Пар', counts:[4,6,8], def:4,
+    rules:['Пары не меняются весь турнир. Каждая пара играет с каждой по одному разу.',
+           '4 пары → 3 раунда на 2 кортах, 6 → 5 раундов на 3 кортах, 8 → 7 раундов на 4 кортах.',
+           'Таблица — по парам: сумма очков → победы → разница.'] },
+};
+const SCORING = {
+  points: { name:'До N очков', sub:'Сумма розыгрышей фиксирована', vals:[16,21,24,32], def:24, unit:'очков',
+            rule:n => `Матч — ровно ${n} розыгрышей. Счёт может быть ${Math.ceil(n / 2) + 2}:${Math.floor(n / 2) - 2} или ${n / 2}:${n / 2}, сумма всегда ${n}. Подача — по 4 мяча подряд, по кругу всех четверых. Введите очки одной пары, вторые подставятся сами.` },
+  time:   { name:'По времени', sub:'Кто больше наберёт за раунд', vals:[10,12,15,20], def:12, unit:'мин',
+            rule:n => `Раунд длится ${n} минут — запустите таймер. Очки считаются как в тай-брейке, по одному за розыгрыш. По сигналу доигрывается текущий мяч; побеждает пара, у которой больше очков, возможна ничья.` },
+};
+const IDEAS = [
+  ['Микс-Американо', 'Американо, где в каждой паре мужчина + женщина. Мужчины и женщины ротируются отдельно.', 'турнир'],
+  ['Король корта', 'Корт 1 — «королевский». Выигравшие поднимаются на корт выше, проигравшие спускаются. В конце считаем, кто сколько раз выиграл на корте 1.', 'турнир'],
+  ['Лестница (Pozo)', 'Как «Король корта», но победители делятся: каждый уходит на корт выше с новым партнёром. Хорошо перемешивает уровни.', 'турнир'],
+  ['Супер-Мексикано', 'Мексикано, где очки на верхнем корте весят больше (×1,5 на корте 1). Мотивирует бороться за первый корт.', 'турнир'],
+  ['Бокс-лига', 'Группы по 4–5 игроков на месяц, внутри — круговая. По итогам месяца двое лучших поднимаются в группу выше.', 'лига'],
+  ['Группы + плей-офф', 'Командное американо в группах по 4 пары, затем полуфиналы и финал сетом до 6.', 'турнир'],
+  ['Золотой мяч / Star Point / «больше»', 'Три правила для 40:40 — все есть в счётчике матча.', 'есть в счётчике'],
+  ['Fast4 и Про-сет', 'Сеты до 4 геймов или один сет до 9 — когда корт забронирован на час.', 'есть в счётчике'],
+  ['Супер-тай-брейк', 'Вместо третьего сета — тай-брейк до 10. Стандарт любительских турниров.', 'есть в счётчике'],
+  ['Тай-брейк-американо', 'Каждый матч Американо — один тай-брейк до 7 или до 10. Очень быстрый формат на 30–40 минут.', 'вариант Американо'],
+  ['Гандикап', 'Слабая пара начинает каждый гейм с 15:0 или матч с форой 2–3 гейма. Уравнивает разные уровни.', 'правило'],
+  ['Без второй подачи', 'Одна попытка подачи. Ускоряет игру и тренирует надёжную подачу.', 'правило'],
+];
+
+// Идеальные расписания «вист»: игрок n-1 неподвижен, остальные сдвигаются по модулю n-1.
+// Каждый с каждым в паре — 1 раз, против — 2 раза (проверено перебором).
+const WHIST = {
+  4:  [[[0,3],[1,2]]],
+  8:  [[[6,5],[0,2]],[[1,4],[7,3]]],
+  12: [[[0,2],[3,7]],[[8,5],[10,9]],[[4,11],[6,1]]],
+  16: [[[0,14],[4,8]],[[15,10],[11,2]],[[12,7],[6,9]],[[13,5],[1,3]]],
+};
+function americanoRounds(n) {
+  const m = n - 1, R = [];
+  for (let r = 0; r < m; r++)
+    R.push(WHIST[n].map(([p, q]) => ({ a: p.map(x => x === m ? m : (x + r) % m), b: q.map(x => x === m ? m : (x + r) % m), sa: null, sb: null })));
+  return R;
+}
+// круговая система для постоянных пар (метод «по кругу»)
+function teamRounds(n) {
+  const m = n - 1, R = [];
+  for (let r = 0; r < m; r++) {
+    const ms = [{ a: [m], b: [r], sa: null, sb: null }];
+    for (let k = 1; k < n / 2; k++) ms.push({ a: [(r + k) % m], b: [(r - k + m) % m], sa: null, sb: null });
+    R.push(ms);
+  }
+  return R;
+}
+// раунд Мексикано по порядку rank: в каждой четвёрке 1+3 против 2+4
+const mexRound = rank => { const ms = []; for (let i = 0; i < rank.length; i += 4) ms.push({ a: [rank[i], rank[i + 2]], b: [rank[i + 1], rank[i + 3]], sa: null, sb: null }); return ms; };
+
+const KEY = 'padel-tournament-v1';
+const $ = id => document.getElementById(id);
+let cfg = { format:'americano', count:8, rounds:7, scoring:'points', val:24, names:{}, shuffle:false };
+let T = null, view = 0, tick = null;
+
+const defName = (f, i) => f === 'team' ? `Пара ${i + 1}` : `Игрок ${i + 1}`;
+const entName = i => T.names[i];
+const done = m => Number.isInteger(m.sa) && Number.isInteger(m.sb);
+
+function standings() {
+  const st = T.names.map((n, i) => ({ i, n, pts:0, ag:0, w:0, d:0, l:0, pl:0 }));
+  for (const rd of T.rounds) for (const m of rd) {
+    if (!done(m)) continue;
+    for (const [side, mine, theirs] of [[m.a, m.sa, m.sb], [m.b, m.sb, m.sa]]) for (const p of side) {
+      const x = st[p]; x.pts += mine; x.ag += theirs; x.pl++;
+      if (mine > theirs) x.w++; else if (mine < theirs) x.l++; else x.d++;
+    }
+  }
+  return st.sort((a, b) => b.pts - a.pts || b.w - a.w || (b.pts - b.ag) - (a.pts - a.ag) || a.i - b.i);
+}
+
+// ---------- настройка ----------
+function readNames() {
+  const list = [...$('plist').querySelectorAll('input')].map(x => x.value.trim());
+  cfg.names[cfg.format] = list;
+}
+function renderSetup() {
+  const F = FORMATS[cfg.format], S = SCORING[cfg.scoring];
+  $('formats').innerHTML = Object.entries(FORMATS).map(([k, f]) => `<button class="opt ${cfg.format === k ? 'on' : ''}" data-format="${k}">${f.name}<small>${f.sub}</small></button>`).join('');
+  $('countLbl').textContent = F.unit;
+  $('counts').innerHTML = F.counts.map(c => `<button class="${cfg.count === c ? 'on' : ''}" data-count="${c}">${c}</button>`).join('');
+  $('roundsWrap').classList.toggle('hidden', cfg.format !== 'mexicano');
+  $('roundsSeg').innerHTML = [3,5,7,9,11].map(c => `<button class="${cfg.rounds === c ? 'on' : ''}" data-rounds="${c}">${c}</button>`).join('');
+  $('scoring').innerHTML = Object.entries(SCORING).map(([k, s]) => `<button class="opt ${cfg.scoring === k ? 'on' : ''}" data-scoring="${k}">${s.name}<small>${s.sub}</small></button>`).join('');
+  $('scoreVal').innerHTML = S.vals.map(v => `<button class="${cfg.val === v ? 'on' : ''}" data-val="${v}">${v} ${S.unit}</button>`).join('');
+  $('namesLbl').textContent = cfg.format === 'team' ? 'Пары' : 'Игроки';
+  const saved = cfg.names[cfg.format] || [];
+  let h = '';
+  for (let i = 0; i < cfg.count; i++) h += `<input type="text" placeholder="${defName(cfg.format, i)}" value="${(saved[i] || '').replace(/"/g, '&quot;')}">`;
+  $('plist').innerHTML = h;
+  $('shuffle').checked = cfg.shuffle;
+}
+$('setup').onclick = e => {
+  const b = e.target.closest('[data-format],[data-count],[data-rounds],[data-scoring],[data-val]');
+  if (!b) return;
+  readNames();
+  const d = b.dataset;
+  if (d.format) { cfg.format = d.format; const F = FORMATS[d.format]; if (!F.counts.includes(cfg.count)) cfg.count = F.def; }
+  if (d.count) cfg.count = +d.count;
+  if (d.rounds) cfg.rounds = +d.rounds;
+  if (d.scoring) { cfg.scoring = d.scoring; cfg.val = SCORING[d.scoring].def; }
+  if (d.val) cfg.val = +d.val;
+  renderSetup(); renderRules(); saveCfg();
+};
+$('shuffle').onchange = e => { cfg.shuffle = e.target.checked; saveCfg(); };
+$('plist').oninput = () => { readNames(); saveCfg(); };
+
+$('startBtn').onclick = () => {
+  readNames();
+  let names = [...Array(cfg.count)].map((_, i) => (cfg.names[cfg.format] || [])[i] || defName(cfg.format, i));
+  if (cfg.shuffle) for (let i = names.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [names[i], names[j]] = [names[j], names[i]]; }
+  const c = JSON.parse(JSON.stringify(cfg));
+  const rounds = c.format === 'americano' ? americanoRounds(c.count) : c.format === 'team' ? teamRounds(c.count) : [mexRound([...Array(c.count).keys()])];
+  T = { cfg:c, names, rounds, total: c.format === 'mexicano' ? c.rounds : rounds.length, timer:{ left:c.val * 60, endAt:null } };
+  view = 0; save();
+};
+
+// ---------- турнир ----------
+function curRound() { let i = T.rounds.findIndex(rd => !rd.every(done)); return i < 0 ? T.rounds.length - 1 : i; }
+function finished() { return T.rounds.length === T.total && T.rounds.every(rd => rd.every(done)); }
+
+function render() {
+  const live = !!T;
+  $('setup').classList.toggle('hidden', live);
+  ['roundBox', 'standBox'].forEach(id => $(id).classList.toggle('hidden', !live));
+  $('timerBox').classList.toggle('hidden', !live || T.cfg.scoring !== 'time' || finished());
+  renderRules();
+  if (!live) { $('champ').classList.add('hidden'); return; }
+  view = Math.min(view, T.rounds.length - 1);
+  const rd = T.rounds[view], pointsMode = T.cfg.scoring === 'points', N = T.cfg.val;
+  $('roundTitle').textContent = `Раунд ${view + 1} из ${T.total}`;
+  let tabs = '';
+  for (let i = 0; i < T.total; i++) {
+    const has = i < T.rounds.length;
+    tabs += `<button class="${i === view ? 'on' : ''} ${has && T.rounds[i].every(done) ? 'ok' : ''}" data-view="${i}" ${has ? '' : 'disabled'}>${i + 1}</button>`;
+  }
+  $('roundTabs').innerHTML = tabs;
+  $('matches').innerHTML = rd.map((m, k) => {
+    const win = done(m) ? (m.sa > m.sb ? 'a' : m.sb > m.sa ? 'b' : '') : '';
+    const warn = pointsMode && done(m) && m.sa + m.sb !== N ? `<div class="warn">Сумма ${m.sa + m.sb}, а должна быть ${N}</div>` : '';
+    return `<div class="match ${done(m) ? 'done' : ''}">
+      <div class="court-n">Корт <b>${k + 1}</b></div>
+      <div class="vs">
+        <div class="side ${win === 'a' ? 'win' : ''}">${m.a.map(p => `<span class="p">${entName(p)}</span>`).join('')}</div>
+        <div class="scoreIn"><input type="number" min="0" inputmode="numeric" data-m="${k}" data-s="a" value="${m.sa ?? ''}"><span>:</span>
+          <input type="number" min="0" inputmode="numeric" data-m="${k}" data-s="b" value="${m.sb ?? ''}"></div>
+        <div class="side r ${win === 'b' ? 'win' : ''}">${m.b.map(p => `<span class="p">${entName(p)}</span>`).join('')}</div>
+      </div>${warn}</div>`;
+  }).join('');
+  // кнопка «дальше»
+  const nb = $('nextBtn'), cr = curRound(), allDone = rd.every(done);
+  if (finished()) { nb.textContent = '🏆 Турнир завершён'; nb.disabled = true; }
+  else if (T.cfg.format === 'mexicano' && view === T.rounds.length - 1) { nb.textContent = allDone ? `Составить раунд ${view + 2} по таблице →` : 'Внесите все счета раунда'; nb.disabled = !allDone; }
+  else { nb.textContent = view < T.rounds.length - 1 ? `К раунду ${view + 2} →` : 'Внесите все счета раунда'; nb.disabled = view >= T.rounds.length - 1; }
+  // таблица
+  const st = standings();
+  let h = `<tr><th>#</th><th>${T.cfg.format === 'team' ? 'Пара' : 'Игрок'}</th><th>Очки</th><th>И</th><th>В</th><th>Н</th><th>П</th><th>±</th></tr>`;
+  st.forEach((x, i) => {
+    const diff = x.pts - x.ag;
+    h += `<tr class="p${i + 1}"><td class="pl">${i + 1}</td><td>${x.n}</td><td class="big">${x.pts}</td><td>${x.pl}</td><td>${x.w}</td><td>${x.d}</td><td>${x.l}</td><td class="${diff > 0 ? 'pos' : diff < 0 ? 'neg' : ''}">${diff > 0 ? '+' : ''}${diff}</td></tr>`;
+  });
+  $('stand').innerHTML = h;
+  $('champ').classList.toggle('hidden', !finished());
+  if (finished()) $('champ').innerHTML = `🏆 Победитель: ${st[0].n} — ${st[0].pts} очков`;
+  renderTimer();
+}
+
+$('roundTabs').onclick = e => { const b = e.target.closest('[data-view]'); if (b) { view = +b.dataset.view; render(); } };
+$('matches').addEventListener('change', e => {
+  const inp = e.target.closest('input[data-m]'); if (!inp) return;
+  const m = T.rounds[view][+inp.dataset.m], s = inp.dataset.s, v = inp.value === '' ? null : Math.max(0, Math.round(+inp.value));
+  m['s' + s] = v;
+  // в режиме «до N очков» вторая цифра подставляется сама
+  if (T.cfg.scoring === 'points' && v !== null && v <= T.cfg.val) m[s === 'a' ? 'sb' : 'sa'] = T.cfg.val - v;
+  save();
+});
+$('nextBtn').onclick = () => {
+  if (T.cfg.format === 'mexicano' && view === T.rounds.length - 1) {
+    T.rounds.push(mexRound(standings().map(x => x.i)));
+  }
+  view++;
+  resetTimer(); save();
+};
+$('newBtn').onclick = () => { if (confirm('Закончить турнир и начать новый? Результаты будут стёрты.')) { T = null; stopTick(); save(); renderSetup(); } };
+$('copyBtn').onclick = async () => {
+  const st = standings();
+  const txt = `${FORMATS[T.cfg.format].name}, ${T.cfg.scoring === 'points' ? 'до ' + T.cfg.val + ' очков' : T.cfg.val + ' мин'}\n` +
+    st.map((x, i) => `${i + 1}. ${x.n} — ${x.pts} оч. (В${x.w} Н${x.d} П${x.l}, ${x.pts - x.ag >= 0 ? '+' : ''}${x.pts - x.ag})`).join('\n');
+  try { await navigator.clipboard.writeText(txt); $('copyBtn').textContent = 'Скопировано ✓'; } catch (e) { prompt('Скопируйте:', txt); }
+  setTimeout(() => $('copyBtn').textContent = 'Скопировать таблицу', 1800);
+};
+
+// ---------- таймер ----------
+const leftNow = () => T.timer.endAt ? Math.max(0, (T.timer.endAt - Date.now()) / 1000) : T.timer.left;
+function renderTimer() {
+  if (!T || T.cfg.scoring !== 'time') return;
+  const left = leftNow(), mm = Math.floor(Math.ceil(left) / 60), ss = Math.ceil(left) % 60;
+  $('clock').textContent = `${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
+  $('clock').classList.toggle('low', left > 0 && left <= 60 && !!T.timer.endAt);
+  $('tStart').textContent = T.timer.endAt ? '❚❚ Пауза' : (left < T.cfg.val * 60 && left > 0 ? '▶ Продолжить' : '▶ Старт');
+  $('tStart').disabled = left <= 0;
+}
+function beep() {
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    [0, .35, .7].forEach(t => { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 880; o.connect(g); g.connect(ac.destination);
+      g.gain.setValueAtTime(.4, ac.currentTime + t); g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + t + .3); o.start(ac.currentTime + t); o.stop(ac.currentTime + t + .3); });
+  } catch (e) {}
+}
+function startTick() {
+  stopTick();
+  tick = setInterval(() => {
+    if (!T || !T.timer.endAt) return stopTick();
+    if (leftNow() <= 0) { T.timer.left = 0; T.timer.endAt = null; stopTick(); save(); beep(); $('clock').textContent = 'ВРЕМЯ!'; return; }
+    renderTimer();
+  }, 250);
+}
+function stopTick() { if (tick) clearInterval(tick); tick = null; }
+function resetTimer() { if (T) T.timer = { left: T.cfg.val * 60, endAt: null }; stopTick(); }
+$('tStart').onclick = () => {
+  if (T.timer.endAt) { T.timer.left = leftNow(); T.timer.endAt = null; stopTick(); }
+  else { T.timer.endAt = Date.now() + T.timer.left * 1000; startTick(); }
+  save();
+};
+$('tReset').onclick = () => { resetTimer(); save(); };
+
+// ---------- правила и идеи ----------
+function renderRules() {
+  const c = T ? T.cfg : cfg, F = FORMATS[c.format], S = SCORING[c.scoring];
+  $('rules').innerHTML = `<h2>${F.name}</h2><ul>${F.rules.map(r => `<li>${r}</li>`).join('')}</ul>
+    <h2>Счёт: ${S.name.replace('N', c.val)}</h2><ul><li>${S.rule(c.val)}</li></ul>`;
+}
+$('ideas').innerHTML = IDEAS.map(([t, d, k]) => `<div class="idea"><b>${t}</b>${d}<br><em>${k}</em></div>`).join('');
+
+// ---------- хранение ----------
+function saveCfg() { localStorage.setItem(KEY, JSON.stringify({ T, cfg, view })); }
+function save() { saveCfg(); render(); }
+try { const d = JSON.parse(localStorage.getItem(KEY)); if (d) { T = d.T; cfg = Object.assign(cfg, d.cfg); view = d.view || 0; } } catch (e) {}
+renderSetup();
+render();
+if (T && T.timer && T.timer.endAt) startTick();
+</script>
+</body>
+</html>
