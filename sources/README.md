@@ -17,4 +17,15 @@
 - [PadelVic](https://github.com/UPC-ViRVIG/PadelVic), [Padel-Shot-Classification](https://github.com/guillecartes/Padel-Shot-Classification-and-Dataset) — датасеты для распознавания ударов.
 
 ## Видео и статьи
-- (добавлять сюда)
+
+### The Padel School — https://www.youtube.com/@ThePadelSchool
+Тренеры Sandy Farquharson и Tom. Из этих роликов взяты 10 ситуаций набора «The Padel School» в [тесте](../quiz.html):
+
+- [Stop Scooping Lobs: Attack With Bajada](https://youtu.be/q14sq5ky1f0) — мяч отскочил от стекла далеко — атакуй бахадой, а не выкидывай свечу.
+- [The Overhead Decision That Defines Your Padel Game](https://youtu.be/Sza4GJoz6kM) — бандеха медленная, чтобы успеть вернуться к сетке; вибора — атака.
+- [How Pros Handle Lobbing](https://youtu.be/KD0ORtRw4x8) — после свечи: сначала не потерять сетку, бандеха кроссом, не вдоль линии.
+- [How Pros Play Chiquitas](https://youtu.be/7CqmDPh5lYY) — чикита медленная, через стекло; на плохой чиките к сетке не идти; обводки сзади «нет».
+- [5 Hacks to Finish More Points](https://youtu.be/DtunsOqRbVk) — воле коротко в центр, потом сразу в открывшееся место.
+- [Finish Points: 3 Tips](https://youtu.be/45FaHNUxKWs) — подготовка → что будет дальше → бей туда, где их нет.
+- [How Pros Deal With Corners](https://youtu.be/77VVlM7aVZc) — в углу решай заранее «боковое или заднее», в защите играй мягко.
+- [Padel Tactics Every Player Gets Wrong](https://youtu.be/_tHe1NCuH70) — ничья земля; говори партнёру, где соперники, а не командуй.

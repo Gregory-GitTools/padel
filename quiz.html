@@ -35,6 +35,10 @@
   .final { text-align:center; padding:30px 10px; }
   .final .big { font-family:Unbounded; font-weight:900; font-size:64px; color:var(--ball); line-height:1; }
   .final p { color:var(--dim); font-weight:700; }
+  .chips { display:flex; gap:8px; overflow-x:auto; margin:0 0 12px; scrollbar-width:none; }
+  .chips button { white-space:nowrap; padding:8px 14px; border-radius:999px; font-size:14px; }
+  .chips button.on { background:var(--ball); color:#0b1426; border-color:var(--ball); }
+  .verdict .src { display:inline-block; margin-top:8px; color:var(--dim); font-size:13.5px; font-weight:700; text-decoration:none; }
   .vbtn { padding:8px 12px; border-radius:999px; font-size:15px; }
 </style>
 </head>
@@ -51,7 +55,7 @@
 // p — расстановка: y — ты, m — партнёр, a/b — соперники; ball — мяч.
 // opts: t — ответ, g — оценка (2 лучший, 1 можно, 0 ошибка), d — полёт мяча, h — высота дуги, r — что будет.
 // truth — что произойдёт на самом деле (для вопросов «Что будет?»), who:'y' — двигается игрок, а не мяч.
-const Q = [
+const BASE = [
   { k:'Что играть?', q:'Соперники у сетки. К тебе низкий удобный мяч.',
     p:{ y:[70,360], m:[150,360], a:[60,150], b:[140,150] }, ball:[78,345],
     opts:[ { t:'Сильно в центр', g:0, d:'M78 345 L100 160', h:.2, r:'Сеточник ловит с лёта и добивает. Сила против сетки проигрывает.' },
@@ -105,6 +109,66 @@ const Q = [
            { t:'Мягко поднять глубоко', g:2, d:'M86 236 L140 40', h:.6, r:'Мягко, глубоко — держишь сетку и ждёшь удобный мяч.' },
            { t:'Пропустить', g:0, d:'M86 236 L82 330', h:.1, r:'Мяч остался на твоей половине — очко им.' } ] },
 ];
+// Ситуации из роликов The Padel School (youtube.com/@ThePadelSchool); src — id ролика.
+const VID = {
+  q14sq5ky1f0:'Stop Scooping Lobs: Attack With Bajada', Sza4GJoz6kM:'The Overhead Decision That Defines Your Padel Game',
+  KD0ORtRw4x8:'How Pros Handle Lobbing', '7CqmDPh5lYY':'How Pros Play Chiquitas', DtunsOqRbVk:'5 Hacks to Finish More Points',
+  '45FaHNUxKWs':'Finish Points: 3 Tips', '77VVlM7aVZc':'How Pros Deal With Corners', '_tHe1NCuH70':'Padel Tactics Every Player Gets Wrong',
+};
+const TPS = [
+  { k:'Что играть?', src:'q14sq5ky1f0', q:'Тебя перекинули свечой. Мяч отскочил от заднего стекла высоко и далеко от него.',
+    p:{ y:[110,352], m:[150,300], a:[60,150], b:[140,150] }, ball:[76,340],
+    opts:[ { t:'Выкинуть свечу из-под мяча', g:1, d:'M76 340 L140 25', h:1.7, r:'Годится, если мяч прижался к стеклу. Но этот отскочил удобно — шанс отдан.' },
+           { t:'Бахада: сверху вниз, в атаку', g:2, d:'M76 340 L100 122', h:.3, r:'95% таких мячей можно атаковать. Встань сбоку с запасом, ракетка выше мяча — и вниз.' },
+           { t:'Встать вплотную и ждать мяч', g:0, d:'M76 340 L92 203', h:.15, r:'Слишком близко — мяч «съест», удар без баланса. Отходи сбоку от мяча.' } ] },
+  { k:'Как бить?', src:'Sza4GJoz6kM', q:'Глубокая свеча. Ты пятишься на бандеху.',
+    p:{ y:[70,300], m:[148,256], a:[60,110], b:[140,110] }, ball:[66,288],
+    opts:[ { t:'Быстро и сильно', g:0, d:'M66 288 L110 6 L106 85', h:.3, r:'Быстрый мяч быстро вернётся — к сетке не успеешь. Смысл бандехи пропал.' },
+           { t:'Медленно и глубоко — и сразу вперёд', g:2, d:'M66 288 L168 18', h:.8, r:'Бандеха нужна, чтобы удержать сетку. Медленный мяч даёт время вернуться.' },
+           { t:'Пропустить и сыграть от стекла', g:1, d:'M66 288 L60 392', h:.9, r:'Если бандеха пока не своя — нормально. Но сетку отдал.' } ] },
+  { k:'Куда?', src:'KD0ORtRw4x8', q:'Ты справа, отошёл на бандеху. Соперники идут вперёд.',
+    p:{ y:[150,300], m:[60,256], a:[55,120], b:[145,120] }, ball:[154,288],
+    opts:[ { t:'Вдоль линии', g:0, d:'M154 288 L184 40', h:.7, r:'Вдоль линии раскрываешь корт — придётся остаться сзади.' },
+           { t:'По диагонали', g:2, d:'M154 288 L28 40', h:.7, r:'Кросс — длинный путь мяча и время вернуться к сетке.' },
+           { t:'Мягко в центр', g:1, d:'M154 288 L100 112', h:.5, r:'Хорошо против тех, кто уже у сетки. Здесь кросс надёжнее.' } ] },
+  { k:'Что делать?', src:'7CqmDPh5lYY', q:'Твоя чикита вышла высокой. Сеточник её ждёт.',
+    p:{ y:[70,365], m:[150,365], a:[60,150], b:[140,150] }, ball:[80,170],
+    opts:[ { t:'Бежать к сетке', g:0, who:'y', d:'M70 365 L70 255', r:'Выход на плохой чиките — дыры за спиной. Получишь в ноги.' },
+           { t:'Остаться сзади, ждать мяч', g:2, who:'y', d:'M70 365 L72 372', r:'Чикита бывает защитной. Не вышла — стой, терпи, жди следующий.' },
+           { t:'Шагнуть до середины', g:0, who:'y', d:'M70 365 L70 312', r:'Ничья земля: мяч в ноги — и всё.' } ] },
+  { k:'Какую?', src:'7CqmDPh5lYY', q:'Хочешь через чикиту выйти к сетке вдвоём.',
+    p:{ y:[70,360], m:[150,360], a:[60,150], b:[140,150] }, ball:[76,345],
+    opts:[ { t:'Быструю, с вращением в ноги', g:0, d:'M76 345 L92 174', h:.15, r:'Быстро ушла — быстро вернётся блоком. Застрянете на полпути.' },
+           { t:'Медленную, падающую за сеткой', g:2, d:'M76 345 L92 176', h:.9, r:'Медленно — чтобы успеть выйти вместе. А им бить снизу вверх.' },
+           { t:'Обводку мимо сеточника', g:0, d:'M76 345 L194 30', h:.2, r:'Сзади обводки «не существует»: сеточник закрывает почти всю ширину.' } ] },
+  { k:'Что играть?', src:'7CqmDPh5lYY', q:'Сеточник лупит быстрые воле в заднее стекло. Мяч отскочил к тебе.',
+    p:{ y:[70,365], m:[150,360], a:[60,150], b:[140,150] }, ball:[90,382],
+    opts:[ { t:'Сильно в ответ', g:0, d:'M90 382 L100 162', h:.15, r:'Это пинбол, а его выигрывает сетка.' },
+           { t:'Мягко чикиту — стекло погасило скорость', g:2, d:'M90 382 L95 176', h:.9, r:'Быстрые ноги, мягкие руки: стекло замедлило мяч, ты лишь направил.' },
+           { t:'С полулёта, пока не долетел до стекла', g:0, d:'M90 382 L104 203', h:.15, r:'С полулёта быстрый мяч не замедлишь — сетка или подарок.' } ] },
+  { k:'Куда?', src:'DtunsOqRbVk', q:'Ты у сетки, удобный воле. Соперники сзади.',
+    p:{ y:[80,252], m:[150,256], a:[55,45], b:[145,45] }, ball:[86,238],
+    opts:[ { t:'Быстро и глубоко в стекло', g:0, d:'M86 238 L100 4 L100 70', h:.25, r:'Стекло вернёт мяч им прямо в удобную зону.' },
+           { t:'Коротко в центр, низко, с подрезкой', g:2, d:'M86 238 L100 100', h:.2, r:'Оба тянутся в центр и бьют ниже сетки. А по бокам открылось место.' },
+           { t:'В угол', g:1, d:'M86 238 L20 72', h:.25, r:'Неплохо, но угол они ждут. Центр создаёт место.' } ] },
+  { k:'Чем добить?', src:'45FaHNUxKWs', q:'Соперники застряли в «ничьей земле». Тебе средний мяч сверху.',
+    p:{ y:[80,262], m:[150,256], a:[60,115], b:[140,115] }, ball:[86,248],
+    opts:[ { t:'Сильный смэш', g:0, d:'M86 248 L100 118', h:.2, r:'Они близко — сильный мяч отскочит им прямо в ракетку.' },
+           { t:'Мягко с подрезкой в центр, за спину', g:2, d:'M86 248 L100 62', h:.6, r:'Мяч падает за ними и не отскакивает. Бей туда, где их нет.' },
+           { t:'В ноги ближнему', g:1, d:'M86 248 L62 128', h:.2, r:'Можно, но с середины такое блокируют. За спину надёжнее.' } ] },
+  { k:'Что играть?', src:'77VVlM7aVZc', q:'Хороший мяч загнал тебя в угол. Ты в защите.',
+    p:{ y:[34,372], m:[150,320], a:[60,150], b:[140,150] }, ball:[18,390],
+    opts:[ { t:'Сильно, чтобы выбраться', g:0, d:'M18 390 L80 162', h:.15, r:'Паника и сила — сетка ускорит мяч обратно, и ты снова в углу.' },
+           { t:'Мягко: свеча вдоль линии', g:2, d:'M18 390 L26 25', h:1.7, r:'Защищаешься — играй мягко. Свеча ломает ритм и даёт выбраться.' },
+           { t:'Уйти от стекла, бить с полулёта', g:0, d:'M18 390 L70 204', h:.1, r:'Обходишь стекло — никогда его не освоишь. И полулёт тут неудобен.' } ] },
+  { k:'Что делать?', src:'_tHe1NCuH70', q:'Партнёра перекинули, он бежит к стеклу. А ты?',
+    p:{ y:[70,260], m:[150,365], a:[60,150], b:[140,150] }, ball:[150,385],
+    opts:[ { t:'Молчать — пусть сосредоточится', g:0, who:'y', d:'M70 260 L70 264', r:'Он смотрит на мяч и не видит соперников — бьёт вслепую.' },
+           { t:'Крикнуть «Давай, вперёд!»', g:0, who:'y', d:'M70 260 L70 264', r:'Команды подсказывают соперникам и давят на партнёра.' },
+           { t:'Сказать, где соперники: «Оба у сетки!»', g:2, who:'y', d:'M70 260 L70 300', r:'Теперь он выберет сам: бахада, если они сзади, свеча — если у сетки. Говори рано.' } ] },
+];
+const SETS = { base:['Основы', BASE], tps:['The Padel School', TPS] };
+let set = 'base', Q = BASE;
 const GR = { 2:['Отлично!', 1], 1:['Можно', .5], 0:['Ошибка', 0] };
 let qi = 0, score = 0, answers = [], busy = false;
 const app = document.getElementById('app');
@@ -123,10 +187,15 @@ function court(c) {
   </svg>`;
 }
 
+// наборы вопросов: переключатель сверху и на экране итога
+const chips = () => `<div class="chips">${Object.entries(SETS).map(([k, v]) => `<button data-set="${k}" class="${set === k ? 'on' : ''}">${v[0]}</button>`).join('')}</div>`;
+app.addEventListener('click', e => { const b = e.target.closest('[data-set]'); if (b && !busy) { set = b.dataset.set; Q = SETS[set][1]; restart(); } });
+
 function render() {
   if (qi >= Q.length) return final();
   const c = Q[qi];
-  app.innerHTML = `<div class="qtop"><div class="dots">${Q.map((_, i) => `<i class="${i < answers.length ? 'g' + answers[i] : i === qi ? 'now' : ''}"></i>`).join('')}</div>
+  app.innerHTML = `${chips()}
+    <div class="qtop"><div class="dots">${Q.map((_, i) => `<i class="${i < answers.length ? 'g' + answers[i] : i === qi ? 'now' : ''}"></i>`).join('')}</div>
       <div class="pts">${score}</div><button class="vbtn" id="vbtn">${Voice.on ? '🔊' : '🔇'}</button></div>
     <div class="kind">${c.k} · ${qi + 1}/${Q.length}</div>
     <div class="q">${c.q}</div>
@@ -147,10 +216,10 @@ function fly(segs, who) {
     path.setAttribute('stroke-width', '2.5'); path.setAttribute('stroke-dasharray', '5 6'); path.setAttribute('opacity', '.8');
     document.getElementById('trail').appendChild(path);
     const L = path.getTotalLength(), dur = Math.max(450, L * 3.2), t0 = performance.now();
-    const ball = document.getElementById('ball'), sh = document.getElementById('shadow'), me = document.getElementById('pY');
+    const ball = document.getElementById('ball'), sh = document.getElementById('shadow'), me = who && document.getElementById('p' + who.toUpperCase());
     (function step(now) {
       const t = Math.min(1, (now - t0) / dur), pt = path.getPointAtLength(L * t);
-      if (who === 'y') me.setAttribute('transform', `translate(${pt.x} ${pt.y})`);
+      if (who) me.setAttribute('transform', `translate(${pt.x} ${pt.y})`);
       else {
         const lift = Math.sin(Math.PI * t) * (sg.h || 0);
         ball.setAttribute('cx', pt.x); ball.setAttribute('cy', pt.y - lift * 22); ball.setAttribute('r', 6 + lift * 5);
@@ -171,7 +240,7 @@ async function pick(i) {
   const text = o.g === 2 ? o.r : `${o.r} Лучше: ${best.t.toLowerCase()}.`;
   Voice.say(`${GR[o.g][0]} ${text}`);
   await fly(c.truth || [{ d:o.d, h:o.h }], o.who);
-  document.getElementById('after').innerHTML = `<div class="verdict g${o.g}"><h3>${GR[o.g][0]}</h3><p>${text}</p></div>
+  document.getElementById('after').innerHTML = `<div class="verdict g${o.g}"><h3>${GR[o.g][0]}</h3><p>${text}</p>${c.src ? `<a class="src" href="https://youtu.be/${c.src}" target="_blank" rel="noopener">▶ ${VID[c.src]}</a>` : ''}</div>
     <button class="primary nextq" id="nextq">${qi + 1 < Q.length ? 'Дальше →' : 'Итог'}</button>`;
   document.querySelector('.qtop .pts').textContent = score;
   document.getElementById('nextq').onclick = () => { qi++; busy = false; render(); window.scrollTo({ top:0, behavior:'smooth' }); };
@@ -181,12 +250,13 @@ async function pick(i) {
 function final() {
   const max = Q.length, pct = score / max;
   const msg = pct >= .85 ? 'Тактик! Можно на турнир.' : pct >= .6 ? 'Крепко. Пара решений — и будет огонь.' : 'Есть над чем поработать — загляни в Академию.';
-  app.innerHTML = `<div class="final"><div class="kind">Твой результат</div><div class="big">${score}/${max}</div><p>${msg}</p>
+  app.innerHTML = `${chips()}<div class="final"><div class="kind">Твой результат</div><div class="big">${score}/${max}</div><p>${msg}</p>
     <div class="dots" style="margin:18px 0">${answers.map(g => `<i class="g${g}"></i>`).join('')}</div>
     <button class="primary nextq" id="again">Ещё раз</button><a class="nextq" href="academy.html" style="display:block;text-align:center;color:var(--ball);font-weight:800;text-decoration:none">В Академию →</a></div>`;
   Voice.say(`Результат: ${String(score).replace('.', ',')} из ${max}. ${msg}`);
-  document.getElementById('again').onclick = () => { qi = 0; score = 0; answers = []; busy = false; render(); };
+  document.getElementById('again').onclick = restart;
 }
+function restart() { qi = 0; score = 0; answers = []; busy = false; render(); }
 render();
 </script>
 </body>
