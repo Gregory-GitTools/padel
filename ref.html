@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08111f">
+<title>Падел — справка: удары и термины</title>
+<link rel="stylesheet" href="app.css">
+<style>
+  .head { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; padding:12px; cursor:pointer; }
+  .head.nomini { grid-template-columns:1fr auto; padding-left:16px; }
+  .mini { width:84px; height:44px; border-radius:10px; background:linear-gradient(180deg, #123a63, #0d2a1b); display:block; }
+  .t { min-width:0; }
+  .t b { display:block; font-size:19px; line-height:1.2; }
+  .t i { display:block; font-style:normal; color:var(--dim); font-size:15px; font-weight:700; margin-top:2px; }
+  .t i u { text-decoration:none; color:#7fd3ff; }
+  .t .lvl { display:inline-block; font-size:13px; font-weight:800; padding:3px 9px; border-radius:999px; margin-top:4px; }
+  .lvl.l1 { background:rgba(143,227,154,.18); color:#8fe39a; } .lvl.l2 { background:rgba(127,211,255,.18); color:#7fd3ff; } .lvl.l3 { background:rgba(255,90,95,.2); color:#ff9a9d; }
+  .t .one { display:block; color:#d6e0f3; font-size:16px; margin-top:4px; line-height:1.35; }
+  .body { display:none; padding:0 14px 14px; }
+  .card.open .body { display:block; animation:drop .25s ease-out; }
+  .row3 { display:grid; gap:8px; }
+  .row3 div { border-radius:12px; padding:11px 13px; background:rgba(255,255,255,.04); font-size:16.5px; line-height:1.45; }
+  .row3 div::before { display:block; font-size:13px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:3px; }
+  .row3 .w::before { content:"Когда"; color:#7fd3ff; }
+  .row3 .k::before { content:"Фишка"; color:var(--ball); }
+  .row3 .e::before { content:"Не надо"; color:#ff9a9d; }
+  .more { display:inline-block; margin-top:12px; color:var(--ball); font-weight:800; text-decoration:none; font-size:17px; }
+  .sect { margin-bottom:12px; }
+</style>
+</head>
+<body>
+<nav class="top">
+  <div class="logo"><span class="dot"></span>ПАДЕЛ</div>
+  <div class="tabs"><a href="rules.html"><span>📜</span>Правила</a><a href="score.html"><span>🎾</span>Счёт</a><a href="ref.html" class="on"><span>📚</span>Справка</a><a href="academy.html"><span>🎓</span>Академия</a><a href="tournament.html"><span>🏆</span>Турнир</a></div>
+</nav>
+<main class="page">
+  <section class="hero">
+    <h1>Справка <span>падела</span></h1>
+    <p id="count"></p>
+  </section>
+  <div class="chips sect" id="sect"></div>
+  <input class="search" id="q" type="search" placeholder="Поиск: смэш, bandeja, lob…" autocomplete="off">
+  <div class="bar" id="bar"></div>
+  <div class="chips" id="chips"></div>
+  <div id="list"></div>
+</main>
+
+<script src="voice.js"></script>
+<script src="reader.js"></script>
+<script>
+// Мини-схемы сбоку: слева наше стекло, сетка посередине, справа стекло соперника
+const PATHS = {
+  serve:   ['M30 58 Q62 30 100 44 Q130 56 150 70'],
+  drive:   ['M30 50 Q95 32 172 64'],
+  lob:     ['M30 56 Q110 -28 186 60'],
+  chiq:    ['M30 60 Q78 36 128 70'],
+  volley:  ['M80 40 Q122 38 160 70'],
+  drop:    ['M80 44 Q100 32 112 70'],
+  block:   ['M70 66 Q100 44 142 70'],
+  bandeja: ['M44 18 Q122 18 176 70'],
+  vibora:  ['M44 22 Q118 34 168 70'],
+  smash:   ['M42 12 L150 70'],
+  out3:    ['M42 12 L168 70 Q186 34 200 14'],
+  out4:    ['M42 12 L160 70 Q178 40 200 40'],
+  rulo:    ['M42 12 L166 70 Q184 26 194 36'],
+  wall:    ['M150 22 Q60 40 6 66 Q12 44 4 30', 'M34 50 Q112 -14 186 60'],
+  bajada:  ['M150 4 Q40 16 4 36', 'M40 20 L162 70'],
+  contra:  ['M40 50 L5 26 Q84 -22 172 66'],
+  clob:    ['M86 32 Q136 -22 190 56'],
+};
+const SHOTS = [
+  // [id, группа, название, по-испански, уровень, мини-схема, одной фразой, когда, фишка, не надо, ссылка на комикс, по-английски, другие написания для поиска]
+  ['saque', 'serve', 'Подача', 'saque', 1, 'serve', 'Снизу, после отскока, по диагонали.', 'Начало каждого очка.', 'Целься в угол у стекла или в «Т». Подал — беги к сетке.', 'Бить выше пояса.', 'serve', 'serve', 'подать сервис'],
+  ['resto', 'serve', 'Приём', 'resto', 1, 'drive', 'Ответ на подачу.', 'Подающий бежит к сетке.', 'Низко в ноги бегущему или свеча.', 'Лупить в стекло — вернётся.', null, 'return', 'прием возврат'],
+  ['derecha', 'back', 'Справа', 'derecha', 1, 'drive', 'Основной удар сзади.', 'Мяч после отскока, сбоку справа.', 'Короткий замах, мяч перед собой.', 'Теннисный замах «от уха».', 'drive', 'forehand', 'форхенд форхэнд драйв drive'],
+  ['reves', 'back', 'Слева', 'revés', 1, 'drive', 'То же слева, одной рукой.', 'Мяч слева после отскока.', 'С подрезкой — надёжнее.', 'Бить мяч, ушедший за спину.', 'backhand', 'backhand', 'бэкхенд бекхенд реверс reves'],
+  ['globo', 'back', 'Свеча', 'globo', 1, 'lob', 'Высоко за спину сеточникам.', 'Соперники у сетки, ты в защите.', 'Над левым плечом соперника. Сыграл — оба к сетке.', 'Короткая свеча = смэш в тебя.', 'lob', 'lob', 'лоб глобо'],
+  ['chiquita', 'back', 'Чикита', 'chiquita', 2, 'chiq', 'Мягко в ноги сеточникам.', 'Свечу не сыграть, а атаковать нечем.', 'Медленно и низко — пусть бьют снизу вверх.', 'Высокая чикита — подарок.', 'chiquita', 'chiquita', 'чикитта чикуита'],
+  ['passing', 'back', 'Обводка', 'passing', 2, 'drive', 'Мимо сеточника вдоль боковой.', 'Сеточник прилип к центру.', 'Только с удобного мяча.', 'Пытаться с каждого мяча.', null, 'passing shot', 'пассинг обводящий'],
+  ['contraglobo', 'back', 'Ответная свеча', 'contraglobo', 3, 'clob', 'Свеча в ответ на свечу.', 'Тебя перекинули, бежишь назад.', 'Выиграть время и вернуть позицию.', 'Бить сильно на бегу.', null, 'counter-lob', 'контрглобо контр свеча'],
+  ['volea-d', 'net', 'Воле справа', 'volea de derecha', 1, 'volley', 'С лёта у сетки, справа.', 'Ты у сетки, мяч летит на тебя.', 'Без замаха, от плеча, в ноги.', 'Замахиваться.', 'volley', 'forehand volley', 'волей воле волея с лета справа volea volley'],
+  ['volea-r', 'net', 'Воле слева', 'volea de revés', 1, 'volley', 'С лёта у сетки, слева.', 'Мяч в левую сторону у сетки.', 'Ракетка перед грудью всегда.', 'Опускать головку ракетки.', 'volley', 'backhand volley', 'волей воле волея с лета слева volea volley'],
+  ['dejada', 'net', 'Укороченный', 'dejada', 2, 'drop', 'Мяч умирает у сетки.', 'Соперники далеко у стекла.', 'Гаси скорость, мяч едва перелетает.', 'Когда соперник рядом.', null, 'drop shot', 'дехада укоротка дропшот'],
+  ['bloqueo', 'net', 'Блок с полулёта', 'bote pronto', 2, 'block', 'Сразу после отскока у ног.', 'Мяч прилетел в ноги у сетки.', 'Ракетка неподвижна, просто подставь.', 'Махать по мячу.', null, 'half-volley / block', 'блок полулет блокео bloqueo'],
+  ['bandeja', 'over', 'Бандеха', 'bandeja', 2, 'bandeja', 'Контроль над головой — держим сетку.', 'Свеча, но ты успел.', 'Сбоку, с подрезкой, в угол. И снова к сетке.', 'Пытаться убить мяч.', 'bandeja', 'bandeja (tray)', 'бандеджа бандежа бандейха поднос tray'],
+  ['vibora', 'over', 'Вибора', 'víbora', 3, 'vibora', 'Злая бандеха с боковым вращением.', 'Мяч чуть ниже, ты устойчив.', 'Мяч липнет к боковому стеклу.', 'С неудобного мяча.', 'vibora', 'vibora (viper)', 'вибра випера змея viper vibora'],
+  ['remate', 'over', 'Смэш', 'remate', 2, 'smash', 'Добивание — в пол.', 'Короткая свеча у сетки.', 'Между соперниками или в ноги.', 'Смэш с задней линии.', 'smash', 'smash', 'смеш ремате overhead'],
+  ['x3', 'over', 'Смэш «по 3»', 'por tres', 3, 'out3', 'Мяч вылетает за заднюю стенку.', 'Высокий мяч у сетки, есть сила.', 'Мощно в пол у задней линии соперника.', 'Если не уверен — бандеха.', 'smash', 'x3 smash', 'по три на три por 3 x3 вылет'],
+  ['x4', 'over', 'Смэш «по 4»', 'por cuatro', 3, 'out4', 'Мяч вылетает вбок через дверь.', 'Мяч ближе к боковой стенке.', 'Наискосок, к боковому стеклу.', 'Когда двери закрыты/нет выхода.', 'smash', 'x4 smash', 'по четыре на четыре por 4 x4 дверь'],
+  ['rulo', 'over', 'Рульо', 'rulo', 3, 'rulo', 'Смэш с верхним вращением.', 'Высокий мяч, хочешь неудобный отскок.', 'Мяч высоко прыгает от стекла.', 'Путать с силовым смэшем.', null, 'topspin smash', 'руло рульо топспин'],
+  ['gancho', 'over', 'Ганчо', 'gancho', 3, 'bandeja', 'Крюк над головой слева.', 'Свеча ушла за левое плечо.', 'Вместо бэкхенда над головой.', 'Бить, отступая спиной.', null, 'hook', 'ганчо крюк'],
+  ['pared', 'wall', 'Выход с заднего стекла', 'salida de pared', 1, 'wall', 'Ждём отскок от стекла и бьём.', 'Мяч прошёл мимо и летит в стекло.', 'Иди вместе с мячом, бей перед собой.', 'Прижиматься к стеклу.', 'wall', 'back-wall exit', 'стекло стенка от стекла пареда'],
+  ['lateral', 'wall', 'Выход с боковой', 'pared lateral', 2, 'wall', 'Мяч отскочил от бокового стекла.', 'Мяч у боковой стенки.', 'Стой подальше — мяч выйдет к тебе.', 'Бежать к стенке.', null, 'side-wall exit', 'боковое стекло латераль'],
+  ['doble', 'wall', 'Двойная стенка', 'doble pared', 3, 'wall', 'Мяч от двух стёкол подряд.', 'Угол корта.', 'Читай угол заранее, мяч замедляется.', 'Стоять в углу.', null, 'double wall', 'две стенки угол добле'],
+  ['bajada', 'wall', 'Бахада', 'bajada de pared', 3, 'bajada', 'Сверху после отскока от стекла.', 'Высокий мяч вышел от заднего стекла.', 'Защита превращается в атаку.', 'Бить у самого стекла.', 'bajada', 'bajada', 'бахада баджада байада'],
+  ['contrapared', 'wall', 'Контрпаред', 'contrapared', 3, 'contra', 'Бьёшь в своё стекло — мяч перелетает.', 'Последний шанс, мяч прошёл.', 'Сильно вверх в стекло.', 'Делать это без нужды.', null, 'back-wall boast', 'контрпаред контрапаред от своего стекла'],
+];
+const GROUPS = { serve:'Подача и приём', back:'Сзади', net:'У сетки', over:'Над головой', wall:'Со стенками' };
+const LVL = ['', 'база', 'средний', 'продвинутый'];
+// [id, по-русски, по-испански, по-английски, другие написания, что это]
+const TERMS = [
+  ['pista', 'Корт', 'pista', 'court', 'площадка', '20 на 10 метров, со всех сторон стёкла и решётка.'],
+  ['cristal', 'Стекло', 'cristal, pared', 'glass, wall', 'стенка стена', 'Мяч от стекла в игре. Сначала пол, потом стекло — можно бить.'],
+  ['malla', 'Решётка', 'malla', 'fence, mesh', 'сетка металлическая', 'Металлическая сетка по бокам. Отскок от неё непредсказуемый.'],
+  ['red', 'Сетка', 'red', 'net', 'сеть', 'Посередине корта. У сетки атакуют, сзади защищаются.'],
+  ['t', '«Т»', 'la T', 'the T', 'тэ центр', 'Где средняя линия встречает линию подачи. Подача в «Т» — неудобна приёму.'],
+  ['tierra', 'Ничья земля', 'tierra de nadie', 'no man\'s land', 'середина', 'Середина корта. Стоять там нельзя: мяч в ноги — и всё.'],
+  ['drive', 'Правый игрок', 'jugador de derecha', 'right-side player', 'драйв', 'Играет справа. Обычно надёжнее и терпеливее.'],
+  ['reves-p', 'Левый игрок', 'jugador de revés', 'left-side player', 'ревес', 'Играет слева. Чаще добивает над головой.'],
+  ['iguales', 'Ровно', 'iguales', 'deuce', 'сорок сорок 40:40', '40:40. Дальше — «больше» или золотой мяч.'],
+  ['ventaja', 'Больше', 'ventaja', 'advantage', 'преимущество', 'Ещё одно очко — и гейм.'],
+  ['oro', 'Золотой мяч', 'punto de oro', 'golden point', 'решающий мяч', 'При 40:40 один мяч решает гейм. Поле выбирают принимающие.'],
+  ['star', 'Стар пойнт', 'star point', 'star point', 'звездный мяч', 'Третье «ровно» подряд — решающий мяч.'],
+  ['falta', 'Двойная ошибка', 'doble falta', 'double fault', 'две ошибки', 'Две подачи мимо — очко соперникам.'],
+  ['tiebreak', 'Тай-брейк', 'tie-break', 'tie-break', 'тайбрейк', 'При 6:6 в сете. До 7 очков, с разницей в два.'],
+];
+let sect = 'shots', filter = 'all', query = '';
+const $ = id => document.getElementById(id);
+// поиск без регистра, ударений и «ё»
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ё/g, 'е');
+
+function mini(type) {
+  const p = PATHS[type];
+  return `<svg class="mini" viewBox="0 0 200 80" aria-hidden="true">
+    <rect x="0" y="70" width="200" height="10" fill="#2f7de1"/><path d="M0 70 H200" stroke="#cfe8ff" stroke-width="2"/>
+    <path d="M4 70 V24 M196 70 V24" stroke="#7fd3ff" stroke-width="4" opacity=".7"/>
+    <path d="M100 70 V50" stroke="#fff" stroke-width="3"/>
+    ${p.map((d, i) => `<path d="${d}" fill="none" stroke="#d7f205" stroke-width="3.5" stroke-linecap="round" ${i < p.length - 1 ? 'stroke-dasharray="5 6" opacity=".6"' : ''}/>`).join('')}
+  </svg>`;
+}
+const text = id => {
+  if (sect === 'terms') { const t = TERMS.find(x => x[0] === id); return `${t[1]}. ${t[5]}`; }
+  const s = SHOTS.find(x => x[0] === id);
+  return `${s[2]}. ${s[6]} Когда: ${s[7]} Фишка: ${s[8]} Не надо: ${s[9]}`;
+};
+const hit = fields => !query || norm(fields.join(' ')).includes(query);
+const ids = () => sect === 'terms'
+  ? TERMS.filter(t => hit(t)).map(t => t[0])
+  : SHOTS.filter(s => (filter === 'all' || s[1] === filter) && hit([s[2], s[3], s[6], s[11], s[12]])).map(s => s[0]);
+
+function render() {
+  reader.stop();
+  $('count').textContent = sect === 'terms' ? `${TERMS.length} слов, которые слышно на корте.` : `${SHOTS.length} ударов — по-русски, по-испански, по-английски. Нажми на удар — раскроется.`;
+  $('sect').innerHTML = `<button data-s="shots" class="${sect === 'shots' ? 'on' : ''}">🎾 Удары</button><button data-s="terms" class="${sect === 'terms' ? 'on' : ''}">💬 Термины</button><a href="index.html">🖼 Комикс</a>`;
+  $('chips').innerHTML = sect === 'terms' ? '' : [['all', 'Все'], ...Object.entries(GROUPS)].map(([k, n]) => `<button class="${filter === k ? 'on' : ''}" data-f="${k}">${n}</button>`).join('');
+  $('chips').hidden = sect === 'terms';
+  const list = ids();
+  let h = '', last = '';
+  for (const id of list) {
+    if (sect === 'terms') {
+      const t = TERMS.find(x => x[0] === id);
+      h += `<article class="card" id="c-${id}"><div class="head nomini"><div class="t"><b>${t[1]}</b><i><u>ES</u> ${t[2]} · <u>EN</u> ${t[3]}</i><span class="one">${t[5]}</span></div>
+        <button class="spk" data-say="${id}" aria-label="Озвучить">🔊</button></div></article>`;
+      continue;
+    }
+    const s = SHOTS.find(x => x[0] === id);
+    if (s[1] !== last && !query) { h += `<div class="group">${GROUPS[s[1]]}</div>`; last = s[1]; }
+    h += `<article class="card" id="c-${id}">
+      <div class="head">${mini(s[5])}
+        <div class="t"><b>${s[2]}</b><i><u>ES</u> ${s[3]} · <u>EN</u> ${s[11]}</i><span class="lvl l${s[4]}">${LVL[s[4]]}</span><span class="one">${s[6]}</span></div>
+        <button class="spk" data-say="${id}" aria-label="Озвучить">🔊</button></div>
+      <div class="body"><div class="row3"><div class="w">${s[7]}</div><div class="k">${s[8]}</div><div class="e">${s[9]}</div></div>
+        ${s[10] ? `<a class="more" href="index.html#${s[10]}">Комикс по кадрам →</a>` : ''}</div></article>`;
+  }
+  $('list').innerHTML = h || `<div class="empty">Ничего не нашлось. Попробуй по-испански или по-английски.</div>`;
+}
+
+const reader = Reader({ bar:$('bar'), ids, text, el: id => $('c-' + id) });
+$('sect').onclick = e => { const b = e.target.closest('[data-s]'); if (b) { sect = b.dataset.s; filter = 'all'; reader.reset(); render(); } };
+$('chips').onclick = e => { const b = e.target.closest('[data-f]'); if (b) { filter = b.dataset.f; reader.reset(); render(); } };
+$('q').oninput = () => { query = norm($('q').value.trim()); reader.reset(); render(); };
+$('list').onclick = e => {
+  const sp = e.target.closest('[data-say]');
+  if (sp) return reader.toggle(sp.dataset.say, sp);
+  const head = e.target.closest('.head');
+  if (head) head.parentElement.classList.toggle('open');
+};
+if (location.hash === '#terms') sect = 'terms';
+render();
+</script>
+</body>
+</html>

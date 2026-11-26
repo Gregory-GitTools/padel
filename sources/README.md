@@ -19,7 +19,7 @@
 ## Видео и статьи
 
 ### The Padel School — https://www.youtube.com/@ThePadelSchool
-Тренеры Sandy Farquharson и Tom. Из этих роликов взяты 10 ситуаций набора «The Padel School» в [тесте](../quiz.html):
+Тренеры Sandy Farquharson и Tom. Из этих роликов взяты 10 ситуаций набора «The Padel School» в [Академии](../academy.html):
 
 - [Stop Scooping Lobs: Attack With Bajada](https://youtu.be/q14sq5ky1f0) — мяч отскочил от стекла далеко — атакуй бахадой, а не выкидывай свечу.
 - [The Overhead Decision That Defines Your Padel Game](https://youtu.be/Sza4GJoz6kM) — бандеха медленная, чтобы успеть вернуться к сетке; вибора — атака.
@@ -29,3 +29,19 @@
 - [Finish Points: 3 Tips](https://youtu.be/45FaHNUxKWs) — подготовка → что будет дальше → бей туда, где их нет.
 - [How Pros Deal With Corners](https://youtu.be/77VVlM7aVZc) — в углу решай заранее «боковое или заднее», в защите играй мягко.
 - [Padel Tactics Every Player Gets Wrong](https://youtu.be/_tHe1NCuH70) — ничья земля; говори партнёру, где соперники, а не командуй.
+
+### Никита Польщиков — https://www.youtube.com/channel/UCrT1LVH0BojxI84c1BYfsdg
+Тренер на русском (телеграм [@padelschool1](https://t.me/padelschool1)). 12 ситуаций набора «Никита Польщиков» в [Академии](../academy.html) — по главам роликов, ссылки ведут на нужную минуту:
+
+- [Тактика падела: как играть умнее соперника](https://youtu.be/n1If9Jam-z8) — свечи в углы, бахада медленно в центр, к сетке не только через свечу, несколько мячей в одного.
+- [ТОП-7 ошибок новичков](https://youtu.be/8oSC-FpzrQk) — не выигрывать первым ударом, не бить всё сильно, не бояться стекла, ударил — двигайся.
+- [ТОП-6 советов для быстрого прогресса](https://youtu.be/B5Jg0VhkYD0) — континентальный хват, плоский удар, свеча в обороне, сплит-степ.
+- [Как правильно защищаться](https://youtu.be/1g4mIlF-XDM) — позиция, игра от стекла, работа ног, плоский удар, угол.
+- [ТОП-3 удара, которые выигрывают 80% розыгрышей](https://youtu.be/BCFZByCHZnA) — подача, приём, первый воле.
+- [Как улучшить игру](https://youtu.be/lOhy-DGT7h0) — удержать сетку, свеча, двигай соперника по корту.
+- [Волей](https://youtu.be/l9Ot7symHqU) — позиция, хват, слайс, мяч в тело.
+- [Правила за 5 минут](https://youtu.be/5-p0Ea-Q7O4) — подача, розыгрыш, игра с лёта, счёт.
+- Ещё: [подача](https://youtu.be/irQFXcJgSdo), [смэш](https://youtu.be/0pw5agmdvBM), [слайс за 5 минут](https://youtu.be/slpBX5Npojc), [гайд с нуля](https://youtu.be/kmOHQz0sdvM).
+
+### Padel Chess — https://www.facebook.com/profile.php?id=61586022092935
+Страница в Facebook, без входа не открывается. Ждёт разбора.

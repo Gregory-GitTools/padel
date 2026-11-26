@@ -14,12 +14,13 @@ const Voice = (() => {
     if (!opts.queue) synth.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'ru-RU'; if (ru) u.voice = ru; u.rate = st.rate;
-    if (opts.onend) u.onend = opts.onend;
+    if (opts.onend) u.onend = u.onerror = opts.onend;   // onerror — когда речь прервали
     synth.speak(u);
   }
   return {
     say,
     stop: () => synth && synth.cancel(),
+    get speaking() { return !!synth && (synth.speaking || synth.pending); },
     get on() { return st.on; },
     set on(v) { st.on = v; localStorage.setItem(KEY, JSON.stringify(st)); if (!v) synth && synth.cancel(); },
     get rate() { return st.rate; },

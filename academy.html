@@ -4,169 +4,229 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#08111f">
-<title>Академия падела — все удары</title>
+<title>Академия падела — тесты</title>
 <link rel="stylesheet" href="app.css">
 <style>
-  .page { max-width:760px; margin:0 auto; padding:18px 14px 30px; }
-  .hero h1 { font-family:Unbounded, sans-serif; font-weight:900; font-size:clamp(28px, 8vw, 44px); margin:6px 0 4px; line-height:1.05; }
-  .hero h1 span { color:var(--ball); }
-  .hero p { color:var(--dim); margin:0 0 14px; font-weight:600; }
-  .bar { display:flex; gap:8px; align-items:center; margin-bottom:12px; }
-  .bar .primary { flex:1; padding:14px; font-size:16px; border-radius:14px; }
-  .bar button:not(.primary) { padding:14px; font-size:15px; border-radius:14px; }
-  .chips { display:flex; gap:8px; overflow-x:auto; padding:2px 2px 12px; scrollbar-width:none; margin:0 -14px; padding-left:14px; padding-right:14px; }
-  .chips::-webkit-scrollbar { display:none; }
-  .chips button { white-space:nowrap; padding:9px 14px; border-radius:999px; font-size:14px; }
-  .chips button.on { background:var(--ball); color:#0b1426; border-color:var(--ball); }
-  .group { font-family:Unbounded; font-size:13px; letter-spacing:1.4px; color:var(--dim); text-transform:uppercase; margin:20px 0 10px; }
-  .shot { border-radius:18px; border:1px solid var(--line); background:var(--card); margin-bottom:10px; overflow:hidden; transition:border-color .2s, box-shadow .2s; }
-  .shot.playing { border-color:var(--ball); box-shadow:0 0 0 1px var(--ball), 0 0 28px rgba(215,242,5,.18); }
-  .head { display:grid; grid-template-columns:92px 1fr 46px; gap:12px; align-items:center; padding:10px 10px 10px 10px; cursor:pointer; }
-  .mini { width:92px; height:46px; border-radius:10px; background:linear-gradient(180deg, #123a63, #0d2a1b); display:block; }
-  .t { min-width:0; }
-  .t b { display:block; font-size:17px; }
-  .t i { font-style:normal; color:var(--dim); font-size:12.5px; font-weight:700; }
-  .t .lvl { display:inline-block; font-size:10.5px; font-weight:800; padding:2px 7px; border-radius:999px; margin-left:6px; vertical-align:1px; }
-  .lvl.l1 { background:rgba(143,227,154,.18); color:#8fe39a; } .lvl.l2 { background:rgba(127,211,255,.18); color:#7fd3ff; } .lvl.l3 { background:rgba(255,90,95,.2); color:#ff9a9d; }
-  .t .one { display:block; color:#d6e0f3; font-size:14px; margin-top:2px; }
-  .spk { width:46px; height:46px; border-radius:50%; font-size:19px; padding:0; }
-  .body { display:none; padding:0 14px 14px; }
-  .shot.open .body { display:block; animation:drop .25s ease-out; }
-  .row3 { display:grid; gap:8px; }
-  .row3 div { border-radius:12px; padding:10px 12px; background:rgba(255,255,255,.04); font-size:14.5px; line-height:1.45; }
-  .row3 div::before { display:block; font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:2px; }
-  .row3 .w::before { content:"Когда"; color:#7fd3ff; }
-  .row3 .k::before { content:"Фишка"; color:var(--ball); }
-  .row3 .e::before { content:"Не надо"; color:#ff9a9d; }
-  .more { display:inline-block; margin-top:10px; color:var(--ball); font-weight:800; text-decoration:none; font-size:14px; }
+  .page { max-width:560px; padding-top:12px; }
+  .qtop { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .dots { display:flex; gap:4px; flex:1; }
+  .dots button { flex:1; min-width:0; height:30px; padding:0; border:0; background:none; border-radius:6px; position:relative; }
+  .dots button::before { content:""; position:absolute; left:1px; right:1px; top:11px; height:8px; border-radius:4px; background:rgba(255,255,255,.14); }
+  .dots .g2::before { background:var(--ball); } .dots .g1::before { background:#7fd3ff; } .dots .g0::before { background:var(--b); }
+  .dots .now::before { top:7px; height:16px; box-shadow:0 0 0 2px #fff; }
+  .pts { font-family:Unbounded; font-weight:900; color:var(--ball); font-size:22px; min-width:48px; text-align:right; }
+  .vbtn { width:52px; height:52px; padding:0; border-radius:50%; font-size:22px; flex:none; }
+  .kind { font-family:Unbounded; font-size:14px; letter-spacing:1.4px; color:var(--dim); text-transform:uppercase; }
+  .q { font-size:clamp(20px, 5.4vw, 25px); font-weight:800; margin:4px 0 12px; line-height:1.3; }
+  .courtq { display:flex; justify-content:center; margin-bottom:12px; }
+  .courtq svg { height:min(42vh, 400px); width:auto; max-width:100%; border-radius:16px; border:1px solid var(--line); background:#0d2a1b; }
+  .opts { display:grid; gap:10px; }
+  .opts button { text-align:left; padding:16px; font-size:18px; border-radius:16px; display:flex; gap:12px; align-items:center; }
+  .opts button b { font-family:Unbounded; font-size:15px; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.1); flex:none; }
+  .opts button.g2 { border-color:var(--ball); background:rgba(215,242,5,.14); }
+  .opts button.g1 { border-color:#7fd3ff; background:rgba(127,211,255,.12); }
+  .opts button.g0.picked { border-color:var(--b); background:rgba(255,90,95,.16); }
+  .opts button:disabled { opacity:1; cursor:default; }
+  .opts button.dim { opacity:.45; }
+  .verdict { margin-top:12px; border-radius:16px; padding:15px 16px; animation:drop .3s ease-out; }
+  .verdict h3 { margin:0 0 4px; font-family:Unbounded; font-size:20px; }
+  .verdict p { margin:0; font-size:17.5px; line-height:1.45; }
+  .verdict.g2 { background:rgba(215,242,5,.13); border:1px solid var(--ball); } .verdict.g2 h3 { color:var(--ball); }
+  .verdict.g1 { background:rgba(127,211,255,.12); border:1px solid #7fd3ff; } .verdict.g1 h3 { color:#7fd3ff; }
+  .verdict.g0 { background:rgba(255,90,95,.14); border:1px solid var(--b); } .verdict.g0 h3 { color:#ff9a9d; }
+  .verdict .src { display:inline-block; margin-top:10px; color:var(--dim); font-size:16px; font-weight:700; text-decoration:none; }
+  .big { width:100%; margin-top:12px; padding:18px; font-size:19px; border-radius:16px; display:block; text-align:center; text-decoration:none; }
+  a.big { color:var(--ball); font-weight:800; }
+  .final { text-align:center; padding:20px 4px; }
+  .final .score { font-family:Unbounded; font-weight:900; font-size:68px; color:var(--ball); line-height:1; margin:8px 0; }
+  .final p { color:var(--dim); font-weight:700; font-size:18px; }
+  .ch { padding:16px; }
+  .ch b { font-size:20px; } .ch .lang { color:#7fd3ff; font-weight:800; font-size:15px; margin-left:8px; }
+  .ch p { margin:6px 0 12px; font-size:17px; line-height:1.45; color:#d6e0f3; }
+  .ch .row { display:flex; gap:10px; flex-wrap:wrap; }
+  .ch .row a, .ch .row button { flex:1 1 40%; padding:14px; font-size:17px; border-radius:14px; text-align:center; text-decoration:none; font-weight:800; }
+  .ch .row a { color:var(--text); border:1px solid var(--line); background:rgba(255,255,255,.07); }
 </style>
 </head>
 <body>
 <nav class="top">
   <div class="logo"><span class="dot"></span>ПАДЕЛ</div>
-  <div class="tabs"><a href="academy.html" class="on"><span>🎓</span>Академия</a><a href="quiz.html"><span>🧠</span>Тест</a><a href="score.html"><span>🎾</span>Счёт</a><a href="tournament.html"><span>🏆</span>Турнир</a><a href="index.html"><span>📖</span>Комикс</a></div>
+  <div class="tabs"><a href="rules.html"><span>📜</span>Правила</a><a href="score.html"><span>🎾</span>Счёт</a><a href="ref.html"><span>📚</span>Справка</a><a href="academy.html" class="on"><span>🎓</span>Академия</a><a href="tournament.html"><span>🏆</span>Турнир</a></div>
 </nav>
-<main class="page">
-  <section class="hero">
-    <h1>Все удары <span>падела</span></h1>
-    <p id="count"></p>
-  </section>
-  <div class="bar">
-    <button class="primary" id="playAll">▶ Слушать подряд</button>
-    <button id="rateBtn">1×</button>
-  </div>
-  <div class="chips" id="chips"></div>
-  <div id="list"></div>
-</main>
+<main class="page" id="app"></main>
 
 <script src="voice.js"></script>
+<script src="tests.js"></script>
+<script src="reader.js"></script>
 <script>
-// Мини-схемы сбоку: слева наше стекло, сетка посередине, справа стекло соперника
-const PATHS = {
-  serve:   ['M30 58 Q62 30 100 44 Q130 56 150 70'],
-  drive:   ['M30 50 Q95 32 172 64'],
-  lob:     ['M30 56 Q110 -28 186 60'],
-  chiq:    ['M30 60 Q78 36 128 70'],
-  volley:  ['M80 40 Q122 38 160 70'],
-  drop:    ['M80 44 Q100 32 112 70'],
-  block:   ['M70 66 Q100 44 142 70'],
-  bandeja: ['M44 18 Q122 18 176 70'],
-  vibora:  ['M44 22 Q118 34 168 70'],
-  smash:   ['M42 12 L150 70'],
-  out3:    ['M42 12 L168 70 Q186 34 200 14'],
-  out4:    ['M42 12 L160 70 Q178 40 200 40'],
-  rulo:    ['M42 12 L166 70 Q184 26 194 36'],
-  wall:    ['M150 22 Q60 40 6 66 Q12 44 4 30', 'M34 50 Q112 -14 186 60'],
-  bajada:  ['M150 4 Q40 16 4 36', 'M40 20 L162 70'],
-  contra:  ['M40 50 L5 26 Q84 -22 172 66'],
-  clob:    ['M86 32 Q136 -22 190 56'],
-};
-const SHOTS = [
-  // [id, группа, название, по-испански, уровень, мини-схема, одной фразой, когда, фишка, не надо, ссылка на комикс]
-  ['saque', 'serve', 'Подача', 'saque', 1, 'serve', 'Снизу, после отскока, по диагонали.', 'Начало каждого очка.', 'Целься в угол у стекла или в «Т». Подал — беги к сетке.', 'Бить выше пояса.', 'serve'],
-  ['resto', 'serve', 'Приём', 'resto', 1, 'drive', 'Ответ на подачу.', 'Подающий бежит к сетке.', 'Низко в ноги бегущему или свеча.', 'Лупить в стекло — вернётся.'],
-  ['derecha', 'back', 'Справа', 'derecha', 1, 'drive', 'Основной удар сзади.', 'Мяч после отскока, сбоку справа.', 'Короткий замах, мяч перед собой.', 'Теннисный замах «от уха».', 'drive'],
-  ['reves', 'back', 'Слева', 'revés', 1, 'drive', 'То же слева, одной рукой.', 'Мяч слева после отскока.', 'С подрезкой — надёжнее.', 'Бить мяч, ушедший за спину.', 'backhand'],
-  ['globo', 'back', 'Свеча', 'globo', 1, 'lob', 'Высоко за спину сеточникам.', 'Соперники у сетки, ты в защите.', 'Над левым плечом соперника. Сыграл — оба к сетке.', 'Короткая свеча = смэш в тебя.', 'lob'],
-  ['chiquita', 'back', 'Чикита', 'chiquita', 2, 'chiq', 'Мягко в ноги сеточникам.', 'Свечу не сыграть, а атаковать нечем.', 'Медленно и низко — пусть бьют снизу вверх.', 'Высокая чикита — подарок.', 'chiquita'],
-  ['passing', 'back', 'Обводка', 'passing', 2, 'drive', 'Мимо сеточника вдоль боковой.', 'Сеточник прилип к центру.', 'Только с удобного мяча.', 'Пытаться с каждого мяча.'],
-  ['contraglobo', 'back', 'Ответная свеча', 'contraglobo', 3, 'clob', 'Свеча в ответ на свечу.', 'Тебя перекинули, бежишь назад.', 'Выиграть время и вернуть позицию.', 'Бить сильно на бегу.'],
-  ['volea-d', 'net', 'Воле справа', 'volea de derecha', 1, 'volley', 'С лёта у сетки, справа.', 'Ты у сетки, мяч летит на тебя.', 'Без замаха, от плеча, в ноги.', 'Замахиваться.', 'volley'],
-  ['volea-r', 'net', 'Воле слева', 'volea de revés', 1, 'volley', 'С лёта у сетки, слева.', 'Мяч в левую сторону у сетки.', 'Ракетка перед грудью всегда.', 'Опускать головку ракетки.', 'volley'],
-  ['dejada', 'net', 'Укороченный', 'dejada', 2, 'drop', 'Мяч умирает у сетки.', 'Соперники далеко у стекла.', 'Гаси скорость, мяч едва перелетает.', 'Когда соперник рядом.'],
-  ['bloqueo', 'net', 'Блок с полулёта', 'bote pronto', 2, 'block', 'Сразу после отскока у ног.', 'Мяч прилетел в ноги у сетки.', 'Ракетка неподвижна, просто подставь.', 'Махать по мячу.'],
-  ['bandeja', 'over', 'Бандеха', 'bandeja', 2, 'bandeja', 'Контроль над головой — держим сетку.', 'Свеча, но ты успел.', 'Сбоку, с подрезкой, в угол. И снова к сетке.', 'Пытаться убить мяч.', 'bandeja'],
-  ['vibora', 'over', 'Вибора', 'víbora', 3, 'vibora', 'Злая бандеха с боковым вращением.', 'Мяч чуть ниже, ты устойчив.', 'Мяч липнет к боковому стеклу.', 'С неудобного мяча.', 'vibora'],
-  ['remate', 'over', 'Смэш', 'remate', 2, 'smash', 'Добивание — в пол.', 'Короткая свеча у сетки.', 'Между соперниками или в ноги.', 'Смэш с задней линии.', 'smash'],
-  ['x3', 'over', 'Смэш «по 3»', 'por tres', 3, 'out3', 'Мяч вылетает за заднюю стенку.', 'Высокий мяч у сетки, есть сила.', 'Мощно в пол у задней линии соперника.', 'Если не уверен — бандеха.', 'smash'],
-  ['x4', 'over', 'Смэш «по 4»', 'por cuatro', 3, 'out4', 'Мяч вылетает вбок через дверь.', 'Мяч ближе к боковой стенке.', 'Наискосок, к боковому стеклу.', 'Когда двери закрыты/нет выхода.', 'smash'],
-  ['rulo', 'over', 'Рульо', 'rulo', 3, 'rulo', 'Смэш с верхним вращением.', 'Высокий мяч, хочешь неудобный отскок.', 'Мяч высоко прыгает от стекла.', 'Путать с силовым смэшем.'],
-  ['gancho', 'over', 'Ганчо', 'gancho', 3, 'bandeja', 'Крюк над головой слева.', 'Свеча ушла за левое плечо.', 'Вместо бэкхенда над головой.', 'Бить, отступая спиной.'],
-  ['pared', 'wall', 'Выход с заднего стекла', 'salida de pared', 1, 'wall', 'Ждём отскок от стекла и бьём.', 'Мяч прошёл мимо и летит в стекло.', 'Иди вместе с мячом, бей перед собой.', 'Прижиматься к стеклу.', 'wall'],
-  ['lateral', 'wall', 'Выход с боковой', 'pared lateral', 2, 'wall', 'Мяч отскочил от бокового стекла.', 'Мяч у боковой стенки.', 'Стой подальше — мяч выйдет к тебе.', 'Бежать к стенке.'],
-  ['doble', 'wall', 'Двойная стенка', 'doble pared', 3, 'wall', 'Мяч от двух стёкол подряд.', 'Угол корта.', 'Читай угол заранее, мяч замедляется.', 'Стоять в углу.'],
-  ['bajada', 'wall', 'Бахада', 'bajada de pared', 3, 'bajada', 'Сверху после отскока от стекла.', 'Высокий мяч вышел от заднего стекла.', 'Защита превращается в атаку.', 'Бить у самого стекла.', 'bajada'],
-  ['contrapared', 'wall', 'Контрпаред', 'contrapared', 3, 'contra', 'Бьёшь в своё стекло — мяч перелетает.', 'Последний шанс, мяч прошёл.', 'Сильно вверх в стекло.', 'Делать это без нужды.'],
-];
-const GROUPS = { serve:'Подача и приём', back:'Сзади', net:'У сетки', over:'Над головой', wall:'Со стенками' };
-const LVL = ['', 'база', 'средний', 'продвинутый'];
-let filter = 'all', playing = -1;
-const $ = id => document.getElementById(id);
+const GR = { 2:['Отлично!', 1], 1:['Можно', .5], 0:['Ошибка', 0] };
+const KEY = 'padel-tests';
+// ответы помним по каждому набору: { set: { a:{ номер вопроса: номер ответа }, at: где остановился } }
+let store = JSON.parse(localStorage.getItem(KEY) || '{}');
+let sect = 'tests', set = Object.keys(SETS)[0], qi = 0, anim = 0, talking = false;
+if (SETS[location.hash.slice(1)]) set = location.hash.slice(1);
+else if (store.last && SETS[store.last]) set = store.last;
+const app = document.getElementById('app');
+const Q = () => SETS[set].q;
+const mine = () => store[set] || (store[set] = { a:{}, at:0 });
+const save = () => { mine().at = qi; store.last = set; localStorage.setItem(KEY, JSON.stringify(store)); };
+const grade = i => { const a = mine().a[i]; return a == null ? null : Q()[i].opts[a].g; };
+const score = () => Object.keys(mine().a).reduce((s, i) => s + GR[grade(i)][1], 0);
+const fmt = n => String(n).replace('.', ',');
+qi = Math.min(mine().at || 0, Q().length);
 
-function mini(type) {
-  const p = PATHS[type];
-  return `<svg class="mini" viewBox="0 0 200 80" aria-hidden="true">
-    <rect x="0" y="70" width="200" height="10" fill="#2f7de1"/><path d="M0 70 H200" stroke="#cfe8ff" stroke-width="2"/>
-    <path d="M4 70 V24 M196 70 V24" stroke="#7fd3ff" stroke-width="4" opacity=".7"/>
-    <path d="M100 70 V50" stroke="#fff" stroke-width="3"/>
-    ${p.map((d, i) => `<path d="${d}" fill="none" stroke="#d7f205" stroke-width="3.5" stroke-linecap="round" ${i < p.length - 1 ? 'stroke-dasharray="5 6" opacity=".6"' : ''}/>`).join('')}
+function court(c) {
+  const P = (xy, col, lbl, id) => `<g id="${id}" transform="translate(${xy[0]} ${xy[1]})"><circle r="${id === 'pY' ? 12 : 10}" fill="${col}" stroke="${id === 'pY' ? '#d7f205' : '#08111f'}" stroke-width="${id === 'pY' ? 3.5 : 2.5}"/>${lbl ? `<text y="4.5" text-anchor="middle" font-size="11" font-weight="800" fill="#fff" font-family="Manrope">${lbl}</text>` : ''}</g>`;
+  return `<svg viewBox="-6 -6 212 412" id="cq">
+    <defs><linearGradient id="cqg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2a6fd0"/><stop offset=".5" stop-color="#2f7de1"/><stop offset="1" stop-color="#2a6fd0"/></linearGradient></defs>
+    <rect x="0" y="0" width="200" height="400" fill="url(#cqg)" stroke="#7fd3ff" stroke-width="4"/>
+    <path d="M0 61 H200 M0 339 H200 M100 61 V339" stroke="#fff" stroke-width="1.6" opacity=".85"/>
+    <path d="M-4 200 H204" stroke="#fff" stroke-width="4"/>
+    <g id="trail"></g>
+    ${P(c.p.a, '#ff5a5f', '', 'pA')}${P(c.p.b, '#ff5a5f', '', 'pB')}${P(c.p.m, '#3d8bff', '', 'pM')}${P(c.p.y, '#3d8bff', 'ТЫ', 'pY')}
+    <ellipse id="shadow" cx="${c.ball[0]}" cy="${c.ball[1]}" rx="5" ry="3" fill="#000" opacity=".35"/>
+    <circle id="ball" cx="${c.ball[0]}" cy="${c.ball[1]}" r="6" fill="#d7f205" stroke="#08111f" stroke-width="1.5"/>
   </svg>`;
 }
-const textOf = s => `${s[2]}. ${s[6]} Когда: ${s[7]} Фишка: ${s[8]} Не надо: ${s[9]}`;
-const visible = () => SHOTS.map((s, i) => i).filter(i => filter === 'all' || SHOTS[i][1] === filter);
+
+// полёт мяча (или игрока) по траектории; h — высота дуги. instant — сразу конечная точка (вопрос уже отвечен).
+// Листнул во время полёта — anim сменился, анимация тихо бросается.
+function fly(segs, who, instant) {
+  const tok = ++anim;
+  return segs.reduce((pr, sg) => pr.then(() => new Promise(res => {
+    if (tok !== anim) return res();
+    const ns = 'http://www.w3.org/2000/svg', path = document.createElementNS(ns, 'path');
+    path.setAttribute('d', sg.d); path.setAttribute('fill', 'none'); path.setAttribute('stroke', '#d7f205');
+    path.setAttribute('stroke-width', '2.5'); path.setAttribute('stroke-dasharray', '5 6'); path.setAttribute('opacity', '.8');
+    document.getElementById('trail').appendChild(path);
+    const L = path.getTotalLength(), dur = Math.max(450, L * 3.2), t0 = performance.now();
+    const ball = document.getElementById('ball'), sh = document.getElementById('shadow'), me = who && document.getElementById('p' + who.toUpperCase());
+    (function step(now) {
+      if (tok !== anim) return res();
+      const t = instant ? 1 : Math.min(1, (now - t0) / dur), pt = path.getPointAtLength(L * t);
+      if (who) me.setAttribute('transform', `translate(${pt.x} ${pt.y})`);
+      else {
+        const lift = Math.sin(Math.PI * t) * (sg.h || 0);
+        ball.setAttribute('cx', pt.x); ball.setAttribute('cy', pt.y - lift * 22); ball.setAttribute('r', 6 + lift * 5);
+        sh.setAttribute('cx', pt.x); sh.setAttribute('cy', pt.y);
+      }
+      t < 1 ? requestAnimationFrame(step) : res();
+    })(t0);
+  })), Promise.resolve());
+}
+
+const chips = () => `<div class="chips">${Object.entries(SETS).map(([k, v]) => `<button data-set="${k}" class="${set === k ? 'on' : ''}">${v.name}</button>`).join('')}</div>`;
+const qText = c => `${c.k} ${c.q} ${c.opts.map((o, i) => `${'АБВ'[i]}: ${o.t}.`).join(' ')}`;
+function verdictText(c, o) {
+  const best = c.opts.find(x => x.g === 2);
+  return o.g === 2 ? o.r : `${o.r} Лучше: ${best.t.toLowerCase()}.`;
+}
+function verdictHTML(c, o) {
+  return `<div class="verdict g${o.g}"><h3>${GR[o.g][0]}</h3><p>${verdictText(c, o)}</p>${c.src ? `<a class="src" href="https://youtu.be/${c.src}${c.t ? '?t=' + c.t : ''}" target="_blank" rel="noopener">▶ ${VID[c.src]}${c.t ? ` · ${Math.floor(c.t / 60)}:${String(c.t % 60).padStart(2, '0')}` : ''}</a>` : ''}</div>
+    <button class="primary big" data-nav="1">${qi + 1 < Q().length ? 'Дальше →' : 'Итог →'}</button>`;
+}
+// что прочитать по кнопке «Слушать»: вопрос, а если уже ответил — разбор
+function speech() {
+  if (qi >= Q().length) return finalText();
+  const c = Q()[qi], a = mine().a[qi];
+  return a == null ? qText(c) : `${GR[c.opts[a].g][0]} ${verdictText(c, c.opts[a])}`;
+}
+// auto — озвучка сама (по выключателю 🔊); кнопка «Слушать» читает всегда
+let sayTok = 0;
+function say(text, auto) {
+  if (auto && !Voice.on) return;
+  const my = ++sayTok;
+  talking = true; sayBtn();
+  Voice.say(text, { force:true, onend: () => { if (my === sayTok) { talking = false; sayBtn(); } } });
+}
+function sayBtn() { const b = document.getElementById('say'); if (b) { b.textContent = talking ? '■ Стоп' : '▶ Слушать'; b.classList.toggle('on', talking); } }
+function shutUp() { sayTok++; talking = false; Voice.stop(); sayBtn(); }
 
 function render() {
-  $('count').textContent = `${SHOTS.length} ударов — коротко, с озвучкой. Нажми на удар, чтобы раскрыть.`;
-  $('chips').innerHTML = [['all', 'Все'], ...Object.entries(GROUPS)].map(([k, n]) => `<button class="${filter === k ? 'on' : ''}" data-f="${k}">${n}</button>`).join('');
-  let h = '', last = '';
-  for (const i of visible()) {
-    const s = SHOTS[i];
-    if (s[1] !== last) { h += `<div class="group">${GROUPS[s[1]]}</div>`; last = s[1]; }
-    h += `<article class="shot" id="s${i}" data-i="${i}">
-      <div class="head">${mini(s[5])}
-        <div class="t"><b>${s[2]}</b><i>${s[3]}</i><span class="lvl l${s[4]}">${LVL[s[4]]}</span><span class="one">${s[6]}</span></div>
-        <button class="spk" data-say="${i}" aria-label="Озвучить">🔊</button></div>
-      <div class="body"><div class="row3"><div class="w">${s[7]}</div><div class="k">${s[8]}</div><div class="e">${s[9]}</div></div>
-        ${s[10] ? `<a class="more" href="index.html#${s[10]}">Комикс по кадрам →</a>` : ''}</div></article>`;
-  }
-  $('list').innerHTML = h;
-  $('rateBtn').textContent = (Voice.rate === 1.05 ? 1 : Voice.rate) + '×';
+  anim++;
+  const sec = `<div class="chips"><button data-sect="tests" class="${sect === 'tests' ? 'on' : ''}">🧠 Тесты</button><button data-sect="channels" class="${sect === 'channels' ? 'on' : ''}">📺 Каналы</button></div>`;
+  if (sect === 'channels') return app.innerHTML = sec + channels();
+  const N = Q().length;
+  const top = `${chips()}
+    <div class="qtop"><div class="dots">${Q().map((_, i) => `<button data-go="${i}" aria-label="Вопрос ${i + 1}" class="${grade(i) != null ? 'g' + grade(i) : ''} ${i === qi ? 'now' : ''}"></button>`).join('')}</div>
+      <div class="pts">${fmt(score())}</div><button class="vbtn" id="vbtn" aria-label="Авто-озвучка">${Voice.on ? '🔊' : '🔇'}</button></div>
+    <div class="bar"><button data-nav="-1" aria-label="Назад" ${qi === 0 ? 'disabled' : ''}>${CHEV(-1)}</button><button class="primary grow" id="say">▶ Слушать</button><button data-nav="1" aria-label="Вперёд" ${qi >= N ? 'disabled' : ''}>${CHEV(1)}</button></div>`;
+  if (qi >= N) { app.innerHTML = sec + top + final(); sayBtn(); return; }
+  const c = Q()[qi], a = mine().a[qi];
+  app.innerHTML = `${sec}${top}
+    <div class="kind">${c.k} · ${qi + 1}/${N}</div>
+    <div class="q">${c.q}</div>
+    <div class="courtq">${court(c)}</div>
+    <div class="opts">${c.opts.map((o, i) => `<button data-o="${i}"><b>${'АБВ'[i]}</b>${o.t}</button>`).join('')}</div>
+    <div id="after"></div>`;
+  sayBtn();
+  if (a != null) { showPick(c, a); fly(c.truth || [{ d:c.opts[a].d, h:c.opts[a].h }], c.opts[a].who, true); document.getElementById('after').innerHTML = verdictHTML(c, c.opts[a]); }
+  else say(qText(c), true);
 }
 
-function mark(i) {
-  document.querySelectorAll('.shot.playing').forEach(x => x.classList.remove('playing'));
-  const el = $('s' + i);
-  if (el) { el.classList.add('playing', 'open'); el.scrollIntoView({ behavior:'smooth', block:'center' }); }
+function showPick(c, i) {
+  app.querySelectorAll('.opts button').forEach((b, k) => { b.disabled = true; if (k === i) b.classList.add('picked', 'g' + c.opts[i].g); else if (c.opts[k].g === 2) b.classList.add('g2'); else b.classList.add('dim'); });
 }
-function stopAll() { playing = -1; Voice.stop(); $('playAll').textContent = '▶ Слушать подряд'; document.querySelectorAll('.shot.playing').forEach(x => x.classList.remove('playing')); }
-function playFrom(k) {
-  const list = visible();
-  if (k >= list.length) return stopAll();
-  playing = k; mark(list[k]);
-  $('playAll').textContent = '■ Стоп';
-  Voice.say(textOf(SHOTS[list[k]]), { force:true, onend: () => { if (playing === k) setTimeout(() => playing === k && playFrom(k + 1), 600); } });
+async function pick(i) {
+  const c = Q()[qi], o = c.opts[i], at = qi;
+  if (mine().a[qi] != null) return;
+  mine().a[qi] = i; save();
+  showPick(c, i);
+  const dot = app.querySelector(`.dots [data-go="${qi}"]`); dot.classList.add('g' + o.g);
+  app.querySelector('.pts').textContent = fmt(score());
+  say(`${GR[o.g][0]} ${verdictText(c, o)}`, true);
+  const tok = anim + 1;
+  await fly(c.truth || [{ d:o.d, h:o.h }], o.who);
+  if (tok !== anim || at !== qi) return;   // успел перелистнуть
+  document.getElementById('after').innerHTML = verdictHTML(c, o);
+  app.querySelector('#after .big').scrollIntoView({ behavior:'smooth', block:'end' });
 }
 
-$('chips').onclick = e => { const b = e.target.closest('[data-f]'); if (b) { stopAll(); filter = b.dataset.f; render(); } };
-$('list').onclick = e => {
-  const sp = e.target.closest('[data-say]');
-  if (sp) { stopAll(); const i = +sp.dataset.say; mark(i); Voice.say(textOf(SHOTS[i]), { force:true, onend: () => $('s' + i)?.classList.remove('playing') }); return; }
-  const card = e.target.closest('.head');
-  if (card) card.parentElement.classList.toggle('open');
-};
-$('playAll').onclick = () => playing >= 0 ? stopAll() : playFrom(0);
-$('rateBtn').onclick = () => { const r = [1.05, 1.3, 0.9]; Voice.rate = r[(r.indexOf(Voice.rate) + 1) % r.length]; render(); };
-if (!Voice.supported) $('playAll').disabled = true;
+const msgOf = pct => pct >= .85 ? 'Тактик! Можно на турнир.' : pct >= .6 ? 'Крепко. Пара решений — и будет огонь.' : 'Есть над чем поработать — загляни в Справку.';
+function finalText() {
+  const done = Object.keys(mine().a).length, N = Q().length;
+  return done < N ? `Отвечено ${done} из ${N}. Осталось ${N - done}.` : `Результат: ${fmt(score())} из ${N}. ${msgOf(score() / N)}`;
+}
+function final() {
+  const N = Q().length, done = Object.keys(mine().a).length, miss = Q().findIndex((_, i) => mine().a[i] == null);
+  setTimeout(() => say(finalText(), true));
+  return `<div class="final"><div class="kind">${SETS[set].name}</div><div class="score">${fmt(score())}/${N}</div>
+    <p>${done < N ? `Отвечено ${done} из ${N}.` : msgOf(score() / N)}</p>
+    ${miss >= 0 ? `<button class="primary big" data-go="${miss}">Ответить на пропущенные (${N - done})</button>` : ''}
+    <button class="big" id="again">↺ Пройти заново</button>
+    <a class="big" href="ref.html">📚 В Справку →</a></div>`;
+}
+function channels() {
+  return CHANNELS.map(ch => `<article class="card ch"><b>${ch.name}</b><span class="lang">${ch.lang}</span><p>${ch.note}</p>
+    <div class="row"><a href="${ch.url}" target="_blank" rel="noopener">▶ Открыть</a>${ch.q ? `<button class="primary" data-set="${ch.q}">🧠 Тесты (${SETS[ch.q].q.length})</button>` : ''}</div></article>`).join('');
+}
+
+function go(n) {
+  n = Math.max(0, Math.min(Q().length, n));
+  if (n === qi && sect === 'tests') return;
+  shutUp(); qi = n; save(); render();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+app.addEventListener('click', e => {
+  const t = e.target.closest('button, a'); if (!t) return;
+  if (t.dataset.sect) { shutUp(); sect = t.dataset.sect; return render(); }
+  if (t.dataset.set) { shutUp(); sect = 'tests'; set = t.dataset.set; qi = Math.min(mine().at || 0, Q().length); save(); return render(); }
+  if (t.dataset.nav) return go(qi + +t.dataset.nav);
+  if (t.dataset.go) return go(+t.dataset.go);
+  if (t.dataset.o) return pick(+t.dataset.o);
+  if (t.id === 'say') return talking ? shutUp() : say(speech());
+  if (t.id === 'vbtn') { Voice.on = !Voice.on; t.textContent = Voice.on ? '🔊' : '🔇'; return; }
+  if (t.id === 'again') { store[set] = { a:{}, at:0 }; qi = 0; save(); shutUp(); return render(); }
+});
+// свайп влево/вправо — следующий/предыдущий вопрос (кнопки-чипсы листаются сами, их не трогаем)
+let sx = null, sy = 0;
+app.addEventListener('touchstart', e => { sx = e.target.closest('.chips') ? null : e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive:true });
+app.addEventListener('touchend', e => {
+  if (sx == null || sect !== 'tests') return;
+  const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; sx = null;
+  if (Math.abs(dx) > 70 && Math.abs(dx) > 2 * Math.abs(dy)) go(qi + (dx < 0 ? 1 : -1));
+});
+document.addEventListener('keydown', e => { if (sect === 'tests' && e.key === 'ArrowRight') go(qi + 1); if (sect === 'tests' && e.key === 'ArrowLeft') go(qi - 1); });
 render();
 </script>
 </body>

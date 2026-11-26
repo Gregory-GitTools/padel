@@ -7,13 +7,15 @@
 <link rel="stylesheet" href="app.css">
 <style>
   .wrap.t { grid-template-columns:minmax(300px, 400px) 1fr; }
+  /* телефон: одна колонка; настройки первыми, идеи форматов — в самом низу */
+  @media (max-width:900px){ .wrap.t { grid-template-columns:1fr; } .wrap.t .board { order:0; } }
   .plist { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .plist input { font-size:14px; }
-  .plist .pairLbl { grid-column:1 / -1; font-size:12px; color:var(--dim); font-weight:800; margin-top:4px; }
+  .plist input { font-size:17px; padding:12px; }
+  .plist .pairLbl { grid-column:1 / -1; font-size:14px; color:var(--dim); font-weight:800; margin-top:4px; }
   .actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; }
-  .actions button { padding:11px 14px; font-size:14px; }
-  .next { padding:13px 18px; font-size:15px; }
-  .hint { color:var(--dim); font-size:13.5px; margin-top:8px; line-height:1.45; }
+  .actions button { padding:14px 16px; font-size:16px; }
+  .next { padding:16px 20px; font-size:17px; }
+  .hint { color:var(--dim); font-size:15.5px; margin-top:8px; line-height:1.45; }
   .champ { text-align:center; font-family:Unbounded; font-size:22px; padding:18px; border-radius:var(--r);
            background:linear-gradient(135deg, rgba(245,197,24,.25), rgba(245,197,24,.05)); border:1px solid rgba(245,197,24,.6); }
 </style>
@@ -21,7 +23,7 @@
 <body>
 <nav class="top">
   <div class="logo"><span class="dot"></span>ПАДЕЛ</div>
-  <div class="tabs"><a href="academy.html"><span>🎓</span>Академия</a><a href="quiz.html"><span>🧠</span>Тест</a><a href="score.html"><span>🎾</span>Счёт</a><a href="tournament.html" class="on"><span>🏆</span>Турнир</a><a href="index.html"><span>📖</span>Комикс</a></div>
+  <div class="tabs"><a href="rules.html"><span>📜</span>Правила</a><a href="score.html"><span>🎾</span>Счёт</a><a href="ref.html"><span>📚</span>Справка</a><a href="academy.html"><span>🎓</span>Академия</a><a href="tournament.html" class="on"><span>🏆</span>Турнир</a></div>
 </nav>
 <div class="wrap t">
   <div class="control">

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08111f">
+<title>Падел — правила коротко</title>
+<link rel="stylesheet" href="app.css">
+<style>
+  .card { display:grid; grid-template-columns:44px 1fr auto; gap:12px; align-items:center; padding:14px 12px 14px 14px; }
+  .card .n { font-family:Unbounded; font-weight:900; font-size:20px; color:var(--ball); text-align:center; }
+  .card b { display:block; font-size:19px; line-height:1.25; }
+  .card p { margin:4px 0 0; font-size:17px; line-height:1.45; color:#d6e0f3; }
+  .card a { color:var(--ball); font-weight:800; text-decoration:none; }
+</style>
+</head>
+<body>
+<nav class="top">
+  <div class="logo"><span class="dot"></span>ПАДЕЛ</div>
+  <div class="tabs"><a href="rules.html" class="on"><span>📜</span>Правила</a><a href="score.html"><span>🎾</span>Счёт</a><a href="ref.html"><span>📚</span>Справка</a><a href="academy.html"><span>🎓</span>Академия</a><a href="tournament.html"><span>🏆</span>Турнир</a></div>
+</nav>
+<main class="page">
+  <section class="hero">
+    <h1>Правила <span>коротко</span></h1>
+    <p id="count"></p>
+  </section>
+  <div class="bar" id="bar"></div>
+  <div class="chips" id="chips"></div>
+  <div id="list"></div>
+</main>
+
+<script src="voice.js"></script>
+<script src="reader.js"></script>
+<script>
+// [группа, заголовок, текст]
+const RULES = [
+  ['play', 'Двое на двое', 'Корт 20 на 10 метров, вокруг стёкла и решётка. Играют всегда парами.'],
+  ['play', 'Сначала пол', 'Мяч должен отскочить от пола на стороне соперника. Потом может ударить в стекло — он в игре.'],
+  ['play', 'Сразу в стекло — аут', 'Попал в стекло или решётку соперника без отскока от пола — очко им.'],
+  ['play', 'Одно касание пола', 'Бить можно с лёта или после одного отскока. Два отскока — очко потеряно.'],
+  ['play', 'Своё стекло — можно', 'После отскока мяч можно отбить от своего стекла, чтобы он перелетел сетку.'],
+  ['play', 'Мяч попал в тебя', 'Мяч коснулся тебя или партнёра — очко соперникам.'],
+  ['play', 'Сетку не трогать', 'Касаться сетки ракеткой или телом нельзя. Перелезать на чужую сторону тоже.'],
+  ['play', 'Можно выбежать', 'Если мяч вылетел через дверь — догоняй за кортом и возвращай.'],
+  ['serve', 'Подача снизу', 'Сначала отскок от пола, удар на уровне пояса или ниже.'],
+  ['serve', 'Ноги за линией', 'Стоишь за линией подачи и не наступаешь на неё.'],
+  ['serve', 'По диагонали', 'Мяч должен упасть в квадрат подачи соперника. Потом может задеть стекло, но не решётку.'],
+  ['serve', 'Две попытки', 'Первая мимо — подаёшь второй раз. Две мимо — двойная ошибка, очко соперникам.'],
+  ['serve', 'Задел сетку — заново', 'Мяч задел сетку и упал в квадрат — переподача, попытка не сгорает.'],
+  ['serve', 'Справа, потом слева', 'Первое очко гейма — подача справа. Дальше меняешь сторону каждое очко.'],
+  ['serve', 'Приём — после отскока', 'Подачу нельзя брать с лёта. Только после отскока.'],
+  ['score', 'Очки', 'Ноль, пятнадцать, тридцать, сорок, гейм.'],
+  ['score', 'Сорок — сорок', 'Ровно. Дальше «больше» или золотой мяч — договоритесь до игры. <a href="score.html">Счёт →</a>'],
+  ['score', 'Сет', 'До шести геймов с разницей в два. При шести — шесть тай-брейк до семи очков.'],
+  ['score', 'Матч', 'Обычно два сета из трёх.'],
+  ['score', 'Смена сторон', 'После первого, третьего, пятого гейма — после каждого нечётного.'],
+  ['score', 'Кто подаёт', 'Весь гейм подаёт один игрок. Следующий гейм — соперники, потом партнёр.'],
+];
+const GROUPS = { play:'Розыгрыш', serve:'Подача', score:'Счёт' };
+let filter = 'all';
+const $ = id => document.getElementById(id);
+const ids = () => RULES.map((r, i) => i).filter(i => filter === 'all' || RULES[i][0] === filter);
+const text = i => `${RULES[i][1]}. ${RULES[i][2].replace(/<[^>]+>/g, '').replace('→', '')}`;
+
+function render() {
+  reader.stop();
+  $('count').textContent = `${RULES.length} правило — по одному на карточке. Слушай подряд или листай.`;
+  $('chips').innerHTML = [['all', 'Все'], ...Object.entries(GROUPS)].map(([k, n]) => `<button class="${filter === k ? 'on' : ''}" data-f="${k}">${n}</button>`).join('');
+  let h = '', last = '';
+  ids().forEach((i, k) => {
+    const r = RULES[i];
+    if (r[0] !== last) { h += `<div class="group">${GROUPS[r[0]]}</div>`; last = r[0]; }
+    h += `<article class="card" id="r${i}"><span class="n">${i + 1}</span><div><b>${r[1]}</b><p>${r[2]}</p></div>
+      <button class="spk" data-say="${i}" aria-label="Озвучить">🔊</button></article>`;
+  });
+  $('list').innerHTML = h;
+}
+
+const reader = Reader({ bar:$('bar'), ids, text, el: i => $('r' + i) });
+$('chips').onclick = e => { const b = e.target.closest('[data-f]'); if (b) { filter = b.dataset.f; reader.reset(); render(); } };
+$('list').onclick = e => { const sp = e.target.closest('[data-say]'); if (sp) reader.toggle(+sp.dataset.say, sp); };
+render();
+</script>
+</body>
+</html>
