@@ -1,0 +1,26 @@
+/* Меню-барабан (menu.js) — общее для всех страниц, в т.ч. комикса без app.css: цвета свои */
+/* меню-барабан, как в Atlas: кнопка-скруглённый квадрат справа вверху, барабан выезжает из неё вниз */
+.dtoggle { position:fixed; top:10px; right:14px; z-index:70; width:60px; height:60px; border-radius:28%; cursor:pointer;
+  display:grid; place-items:center; border:1px solid rgba(255,255,255,.13); background:rgba(14,28,51,.85); backdrop-filter:blur(10px);
+  color:#eef3ff; font-size:30px; line-height:1; box-shadow:0 8px 24px rgba(0,0,0,.35); transition:background .2s; padding:0; }
+.dtoggle:hover { border-color:#d7f205; }
+.dtoggle.open { background:#d7f205; color:#0b1426; border-color:#d7f205; }
+.dshade { position:fixed; inset:0; z-index:60; background:rgba(4,9,18,.0); touch-action:none; transition:background .25s; }
+.dshade.show { background:rgba(4,9,18,.78); backdrop-filter:blur(3px); }
+.dshade[hidden] { display:none; }
+html.drum-open { overflow:hidden; }
+.drum { position:fixed; right:12px; width:64px; transform-origin:50% 0; transition:transform .25s ease, opacity .25s ease; pointer-events:none; }
+.drum.closed { transform:translateY(-12px) scaleY(.15); opacity:0; }
+.dcell { position:absolute; top:0; left:0; width:64px; height:64px; will-change:transform; }
+.dcell[hidden] { display:none; }
+/* ловят нажатие только кнопки; подписи пропускают — нажатие мимо закрывает меню */
+.drum:not(.closed) .dbtn { pointer-events:auto; }
+.dbtn { display:grid; place-items:center; width:64px; height:64px; border-radius:50%; text-decoration:none; font-size:32px;
+  background:#16294a; border:2px solid rgba(255,255,255,.28); box-shadow:0 6px 18px rgba(0,0,0,.45); }
+.dbtn.on { background:#d7f205; border-color:#d7f205; box-shadow:0 0 22px rgba(215,242,5,.55); }
+/* подпись с номером — слева от кнопки, крутится вместе с ней; номер у самой кнопки */
+.dlabel { position:absolute; top:50%; right:calc(100% + 16px); transform:translateY(-50%); white-space:nowrap; pointer-events:none;
+  color:#eef3ff; font-family:Unbounded, sans-serif; font-weight:700; font-size:22px; text-shadow:0 0 3px #000, 0 0 6px #000; }
+.dlabel[data-num]::after { content:attr(data-num); margin-left:10px; font-family:Manrope, sans-serif; font-size:17px; font-weight:800;
+  color:#9fb0cc; font-variant-numeric:tabular-nums; }
+body.boardOnly .dtoggle { display:none; }

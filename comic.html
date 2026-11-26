@@ -14,7 +14,7 @@
   h1 { font-family:"Rubik Mono One", Rubik, sans-serif; font-size:clamp(26px,5vw,48px); margin:0; letter-spacing:1px;
        color:#fff; -webkit-text-stroke:2px var(--ink); text-shadow:4px 4px 0 var(--ink); }
   header p { max-width:760px; margin:14px auto 0; font-size:17px; }
-  nav { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; position:sticky; top:0; z-index:5;
+  nav { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px 86px 14px 14px; position:sticky; top:0; z-index:5;
         background:rgba(241,233,216,.94); border-bottom:3px solid var(--ink); }
   nav a { text-decoration:none; color:var(--ink); background:#fff; border:2px solid var(--ink); border-radius:20px;
           padding:6px 14px; font-weight:700; font-size:16px; box-shadow:2px 2px 0 var(--ink); }
@@ -56,6 +56,7 @@
   .tip { background:var(--cap); border:3px solid var(--ink); padding:12px 16px; margin:24px 0; box-shadow:4px 4px 0 var(--ink); font-size:16px; }
   footer { text-align:center; font-size:13px; opacity:.7; padding:20px; }
 </style>
+<link rel="stylesheet" href="menu.css">
 </head>
 <body>
 <header>
@@ -344,7 +345,7 @@ SHOTS.forEach(sh => {
     <div class="notes"><div class="card"><h4>Техника</h4><ul>${sh.tech.map(t => `<li>${t}</li>`).join('')}</ul></div>
     <div class="card err"><h4>Частые ошибки</h4><ul>${sh.err.map(t => `<li>${t}</li>`).join('')}</ul></div></div></section>`);
 });
-nav.insertAdjacentHTML('beforeend', `<a href="#tactics">⭐ Тактика</a><a href="#drills">Тренировка</a><a href="#github">GitHub</a><a href="index.html">🏠 Главная</a><a href="rules.html">📜 Правила</a><a href="score.html">🎾 Счёт</a><a href="ref.html">📚 Справка</a><a href="academy.html">🎓 Академия</a><a href="training.html">🏃 Тренировка</a><a href="tournament.html">🏆 Турнир</a>`);
+nav.insertAdjacentHTML('beforeend', `<a href="#tactics">⭐ Тактика</a><a href="#drills">Тренировка</a><a href="#github">GitHub</a>`);
 
 // --- тактические схемы: корт сверху, 20 px = 1 м ---
 const CX = x => 10 + x, CY = y => 15 + y;
@@ -387,5 +388,6 @@ const TACTICS = [
 document.getElementById('tacticsGrid').innerHTML = TACTICS.map(t =>
   `<div class="tactic"><h3>${t.t}</h3><svg viewBox="0 0 420 230">${courtTop(t.s)}</svg><p>${t.p}</p></div>`).join('');
 </script>
+<script src="menu.js" defer></script>
 </body>
 </html>

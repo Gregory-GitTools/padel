@@ -1,5 +1,6 @@
 /* Общий стиль счётчика и турниров: «ночной корт» */
 @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@500;700;800&display=swap');
+@import url('menu.css');
 
 :root {
   --bg:#08111f; --bg2:#0e1c33; --card:rgba(255,255,255,.06); --line:rgba(255,255,255,.13);
@@ -33,21 +34,12 @@ body > * { position:relative; z-index:1; }
 .logo .dot { width:22px; height:22px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #f4ff8a, var(--ball) 55%, #9db000);
              box-shadow:0 0 18px rgba(215,242,5,.7); position:relative; }
 .logo .dot::after { content:""; position:absolute; inset:3px; border-radius:50%; border:2px solid rgba(255,255,255,.7); border-left-color:transparent; border-right-color:transparent; transform:rotate(30deg); }
-.tabs { display:flex; gap:6px; margin-left:auto; flex-wrap:wrap; }
-.tabs a { color:var(--dim); text-decoration:none; font-weight:800; font-size:17px; padding:10px 16px; border-radius:999px; border:1px solid transparent; }
-.tabs a:hover { color:var(--text); border-color:var(--line); }
-.tabs a.on { color:#0b1426; background:var(--ball); }
-.tabs a span { margin-right:8px; font-size:20px; vertical-align:-2px; }
-/* телефон: вкладки — нижняя панель под большой палец */
+/* старые вкладки остаются в разметке (без скриптов, для тестов), а меню — барабан из menu.js */
+.tabs { display:none; }
+.top { padding-right:90px !important; } /* место под кнопку меню */
+
 @media (max-width:700px){
-  body { padding-bottom:calc(86px + env(safe-area-inset-bottom)); }
-  .top { padding:10px 14px; position:static; backdrop-filter:none; background:transparent; }
-  .tabs { position:fixed; left:0; right:0; bottom:0; z-index:50; margin:0; gap:0; flex-wrap:nowrap; justify-content:space-around;
-    padding:6px 4px calc(6px + env(safe-area-inset-bottom)); background:rgba(8,17,31,.94); backdrop-filter:blur(10px); border-top:1px solid var(--line); }
-  .tabs a { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 2px; font-size:13.5px; border-radius:14px; }
-  .tabs a span { margin:0; font-size:28px; line-height:1; }
-  .tabs a.on { color:var(--ball); background:rgba(215,242,5,.1); }
-  body.boardOnly { padding-bottom:0; }
+  .top { padding:10px 14px; position:static; backdrop-filter:none; background:transparent; min-height:80px; }
 }
 
 .wrap { display:grid; grid-template-columns:minmax(300px, 430px) 1fr; gap:20px; padding:20px; max-width:1360px; margin:0 auto; }
