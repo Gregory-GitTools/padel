@@ -50,7 +50,7 @@
 </head>
 <body>
 <nav class="top">
-  <div class="logo"><span class="dot"></span>ПАДЕЛ</div>
+  <a class="logo" href="index.html"><span class="dot"></span>ПАДЕЛ</a>
   <div class="tabs"><a href="rules.html"><span>📜</span>Правила</a><a href="score.html"><span>🎾</span>Счёт</a><a href="ref.html"><span>📚</span>Справка</a><a href="academy.html" class="on"><span>🎓</span>Академия</a><a href="tournament.html"><span>🏆</span>Турнир</a></div>
 </nav>
 <main class="page" id="app"></main>
@@ -115,7 +115,7 @@ function fly(segs, who, instant) {
   })), Promise.resolve());
 }
 
-const chips = () => `<div class="chips">${Object.entries(SETS).map(([k, v]) => `<button data-set="${k}" class="${set === k ? 'on' : ''}">${v.name}</button>`).join('')}</div>`;
+const chips = () => `<div class="chips wrap">${Object.entries(SETS).map(([k, v]) => `<button data-set="${k}" class="${set === k ? 'on' : ''}">${v.name}</button>`).join('')}</div>`;
 const qText = c => `${c.k} ${c.q} ${c.opts.map((o, i) => `${'АБВ'[i]}: ${o.t}.`).join(' ')}`;
 function verdictText(c, o) {
   const best = c.opts.find(x => x.g === 2);

@@ -2,390 +2,61 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Падел в картинках — удары и тактика</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&family=Rubik+Mono+One&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08111f">
+<title>Падел — главная</title>
+<link rel="stylesheet" href="app.css">
 <style>
-  :root { --ink:#1b1b1f; --paper:#fffaf0; --cap:#ffe45c; --blue:#2f6fed; --red:#e5484d; --ball:#d7f205; }
-  * { box-sizing:border-box; }
-  body { margin:0; background:#f1e9d8; color:var(--ink); font-family:Rubik, system-ui, sans-serif; line-height:1.45; }
-  header { text-align:center; padding:36px 16px 10px; }
-  h1 { font-family:"Rubik Mono One", Rubik, sans-serif; font-size:clamp(26px,5vw,48px); margin:0; letter-spacing:1px;
-       color:#fff; -webkit-text-stroke:2px var(--ink); text-shadow:4px 4px 0 var(--ink); }
-  header p { max-width:760px; margin:14px auto 0; font-size:17px; }
-  nav { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; position:sticky; top:0; z-index:5;
-        background:rgba(241,233,216,.94); border-bottom:3px solid var(--ink); }
-  nav a { text-decoration:none; color:var(--ink); background:#fff; border:2px solid var(--ink); border-radius:20px;
-          padding:6px 14px; font-weight:700; font-size:16px; box-shadow:2px 2px 0 var(--ink); }
-  nav a:hover { background:var(--cap); }
-  main { max-width:1100px; margin:0 auto; padding:10px 16px 60px; }
-  section.shot { margin:38px 0; }
-  .shot h2 { font-family:"Rubik Mono One", Rubik, sans-serif; font-size:24px; margin:0 0 4px; }
-  .shot h2 small { font-family:Rubik; font-weight:400; font-size:16px; opacity:.7; }
-  .when { margin:0 0 12px; font-size:16px; }
-  .strip { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-  @media (max-width:760px){ .strip { grid-template-columns:1fr; } }
-  .panel { position:relative; border:3px solid var(--ink); background:var(--paper); box-shadow:5px 5px 0 var(--ink); overflow:hidden; }
-  .panel::before { content:""; position:absolute; inset:0; pointer-events:none;
-      background-image:radial-gradient(rgba(0,0,0,.08) 1.2px, transparent 1.4px); background-size:9px 9px; }
-  .panel svg { display:block; width:100%; height:auto; position:relative; }
-  .caption { position:relative; border-top:3px solid var(--ink); background:var(--cap); padding:8px 10px; font-size:16px; font-weight:600; min-height:64px; }
-  .num { position:absolute; top:6px; left:8px; z-index:2; font-family:"Rubik Mono One"; font-size:15px; background:#fff;
-         border:2px solid var(--ink); border-radius:50%; width:30px; height:30px; display:grid; place-items:center; }
-  .notes { display:grid; grid-template-columns:2fr 1fr; gap:14px; margin-top:14px; }
-  @media (max-width:760px){ .notes { grid-template-columns:1fr; } }
-  .card { background:#fff; border:2px solid var(--ink); border-radius:10px; padding:10px 14px; }
-  .card h4 { margin:0 0 6px; }
-  .card ul { margin:0; padding-left:20px; }
-  .card.err { background:#ffe9e9; }
-  h2.big { font-family:"Rubik Mono One", Rubik, sans-serif; font-size:30px; margin:60px 0 6px; text-align:center; }
-  .lead { text-align:center; max-width:760px; margin:0 auto 20px; }
-  .tactics { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
-  @media (max-width:860px){ .tactics { grid-template-columns:1fr; } }
-  .tactic { background:#fff; border:3px solid var(--ink); box-shadow:5px 5px 0 var(--ink); }
-  .tactic h3 { margin:0; padding:8px 12px; background:var(--ink); color:#fff; font-size:17px; }
-  .tactic svg { display:block; width:100%; height:auto; background:#3f8f5a; }
-  .tactic p { margin:0; padding:10px 12px; font-size:15px; }
-  table { width:100%; border-collapse:collapse; background:#fff; border:3px solid var(--ink); }
-  th, td { border:1px solid #bbb; padding:8px 10px; text-align:left; vertical-align:top; font-size:15px; }
-  th { background:var(--ink); color:#fff; }
-  .legend { display:flex; gap:18px; flex-wrap:wrap; justify-content:center; margin:0 0 14px; font-size:16px; }
-  .legend span::before { content:""; display:inline-block; width:14px; height:14px; border-radius:50%; margin-right:6px; vertical-align:-2px; border:2px solid var(--ink); }
-  .legend .a::before { background:var(--blue); } .legend .b::before { background:var(--red); } .legend .l::before { background:var(--ball); }
-  .tip { background:var(--cap); border:3px solid var(--ink); padding:12px 16px; margin:24px 0; box-shadow:4px 4px 0 var(--ink); font-size:16px; }
-  footer { text-align:center; font-size:13px; opacity:.7; padding:20px; }
+  .tiles { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .tile { display:flex; flex-direction:column; gap:6px; padding:18px 16px; border-radius:20px; border:1px solid var(--line); background:var(--card);
+          color:var(--text); text-decoration:none; min-height:150px; transition:border-color .2s, transform .15s; }
+  .tile:hover { border-color:var(--ball); }
+  .tile:active { transform:scale(.98); }
+  .tile .i { font-size:44px; line-height:1; }
+  .tile b { font-family:Unbounded, sans-serif; font-size:20px; margin-top:4px; }
+  .tile span { color:var(--dim); font-size:16px; font-weight:700; line-height:1.35; }
+  .tile.wide { grid-column:1 / -1; flex-direction:row; align-items:center; gap:16px; min-height:0; }
+  .tile.wide .i { font-size:52px; }
+  .tile.hot { border-color:var(--ball); background:linear-gradient(135deg, rgba(215,242,5,.16), rgba(215,242,5,.03)); }
+  .tile.hot b { color:var(--ball); }
+  .cont { margin:0 0 14px; }
+  @media (max-width:360px){ .tiles { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
-<header>
-  <h1>ПАДЕЛ В КАРТИНКАХ</h1>
-  <p>11 основных ударов — по три кадра на каждый: подготовка, удар, завершение. Под каждым комиксом — техника и типичные ошибки. В конце — тактика на схемах корта и план тренировки.</p>
-</header>
-<nav id="nav"></nav>
-<main>
-  <div class="tip"><b>Общее для всех ударов.</b> Хватка — континентальная («как молоток»), её почти никогда не меняют.
-    Замахи в паделе короче теннисных: мяч медленнее, корт маленький, а стенки возвращают мяч. Головка ракетки держится выше кисти, колени согнуты, бьём перед собой.
-    На кадрах сетка справа, заднее стекло слева.</div>
-  <div id="shots"></div>
-
-  <h2 class="big" id="tactics">ТАКТИКА</h2>
-  <p class="lead">Вид на корт сверху (20 × 10 м). Сетка — посередине.</p>
-  <div class="legend"><span class="a">мы</span><span class="b">соперники</span><span class="l">полёт мяча (пунктир)</span><span>серые стрелки — движение игроков</span></div>
-  <div class="tactics" id="tacticsGrid"></div>
-
-  <h2 class="big" id="drills">ТРЕНИРОВКА ПО ТАКТИКЕ</h2>
-  <p class="lead">Занятие на 60 минут для четверых (или трое + тренер). Каждое упражнение отрабатывает одну тактическую идею со схем выше.</p>
-  <table>
-    <tr><th>Мин</th><th>Упражнение</th><th>Как</th><th>Что тренируем</th></tr>
-    <tr><td>10</td><td>Мини-падел у сетки</td><td>Все четверо у сетки, играем только воле между линиями подачи. Мяч мягко, в ноги или в центр.</td><td>Воле, контроль, игра в центр</td></tr>
-    <tr><td>10</td><td>«Свеча — и вперёд»</td><td>Пара сзади, пара у сетки. Задние ищут свечу. Удачная свеча — оба бегут к сетке и розыгрыш продолжается. Короткая свеча — соперник бьёт смэш.</td><td>Захват сетки свечой</td></tr>
-    <tr><td>10</td><td>«Бандеха в цель»</td><td>Партнёр подаёт свечи. Цель — квадрат 2×2 м в углу у заднего стекла соперника. После каждого удара коснуться ракеткой сетки.</td><td>Удержание сетки, глубина</td></tr>
-    <tr><td>10</td><td>«Чикита против сетки»</td><td>Один сзади играет только чикиту, сеточник отвечает. Очко защитнику, если сеточник ударил выше сетки снизу-вверх.</td><td>Мягкость, атака из защиты</td></tr>
-    <tr><td>10</td><td>«Выход со стекла»</td><td>Партнёр бросает мяч в заднее стекло (сначала с отскоком от пола). Игрок выходит со стекла свечой или чикитой — не силой.</td><td>Терпение, работа со стенками</td></tr>
-    <tr><td>10</td><td>Игра с условием</td><td>Обычный счёт, но очко ×2, если выиграно после захвата сетки свечой, и −1 за смэш, отданный в руки соперника.</td><td>Перенос в игру</td></tr>
-  </table>
-
-  <h2 class="big" id="github">ЧТО ЕСТЬ НА GITHUB</h2>
-  <p class="lead">Проверено 25.11.2026. Учебников по технике там почти нет — есть тактические тренажёры и анализ видео.</p>
-  <table>
-    <tr><th>Проект</th><th>Что это</th></tr>
-    <tr><td><a href="https://miguelsosatr.github.io/padel-tactics/">Pádel Táctico</a><br><small>miguelsosatr/padel-tactics</small></td><td>Игра-тренажёр тактики (испанский, для телефона): каждый удар в розыгрыше — выбор, ответ оценивается «оптимально / зависит / частая ошибка» с пояснением. Есть подача, австралийская расстановка, чикита, вибора. Прототип.</td></tr>
-    <tr><td><a href="https://nikbeznosikov.github.io/padel-eyes/">Padel Eyes</a><br><small>nikbeznosikov/padel-eyes</small></td><td>Тактические задачки в 3D — ситуация показана глазами игрока на корте, к ответам приложены источники.</td></tr>
-    <tr><td><a href="https://frankoosterling92.github.io/PadelTactics/">PadelTactics</a><br><small>frankoosterling92/PadelTactics</small></td><td>Веб-приложение для тактики (без описания, стоит открыть и посмотреть).</td></tr>
-    <tr><td><a href="https://mfermin.github.io/padelCourt/">padelCourt</a></td><td>Простая доска: рисовать тактические схемы на корте.</td></tr>
-    <tr><td><a href="https://github.com/Joao-M-Silva/padel_analytics">padel_analytics</a> ★287</td><td>ИИ-анализ видео матча: трекинг игроков и мяча, распознавание ударов (бандеха, смэш и др.). Самый популярный падел-проект.</td></tr>
-    <tr><td><a href="https://github.com/UPC-ViRVIG/PadelVic">PadelVic</a>, <a href="https://github.com/guillecartes/Padel-Shot-Classification-and-Dataset">Padel-Shot-Classification</a></td><td>Наборы данных и модели для распознавания ударов по видео/датчикам — для разработчиков.</td></tr>
-    <tr><td><a href="https://github.com/Kajatin/Padel-Pro">Padel-Pro</a></td><td>Приложение для iPhone/Apple Watch: запись тренировок по паделу.</td></tr>
-  </table>
+<nav class="top">
+  <a class="logo" href="index.html"><span class="dot"></span>ПАДЕЛ</a>
+  <div class="tabs"><a href="rules.html"><span>📜</span>Правила</a><a href="score.html"><span>🎾</span>Счёт</a><a href="ref.html"><span>📚</span>Справка</a><a href="academy.html"><span>🎓</span>Академия</a><a href="tournament.html"><span>🏆</span>Турнир</a></div>
+</nav>
+<main class="page">
+  <section class="hero">
+    <h1>Падел — <span>с нуля до турнира</span></h1>
+    <p>Правила, удары, тесты на тактику, счёт и турниры. С озвучкой.</p>
+  </section>
+  <a class="tile wide hot cont" id="cont" href="academy.html" hidden></a>
+  <div class="tiles">
+    <a class="tile" href="rules.html"><span class="i">📜</span><b>Правила</b><span>Коротко, по карточке</span></a>
+    <a class="tile" href="score.html"><span class="i">🎾</span><b>Счёт</b><span>Счётчик матча голосом</span></a>
+    <a class="tile" href="ref.html"><span class="i">📚</span><b>Справка</b><span>Удары и термины на 3 языках</span></a>
+    <a class="tile" href="academy.html"><span class="i">🎓</span><b>Академия</b><span id="acaSub">Тесты «Что играть?»</span></a>
+    <a class="tile" href="tournament.html"><span class="i">🏆</span><b>Турнир</b><span>Американо, Мексикано</span></a>
+    <a class="tile" href="comic.html"><span class="i">🖼</span><b>Комикс</b><span>Удары по кадрам</span></a>
+  </div>
 </main>
-<footer>Рисунки сгенерированы кодом (SVG). Схемы и советы — общепринятая базовая методика падела.</footer>
-
+<script src="tests.js"></script>
 <script>
-const G = 210; // линия пола в кадре
-const rad = d => d * Math.PI / 180;
-const dir = (deg, len) => [Math.cos(rad(deg)) * len, -Math.sin(rad(deg)) * len];
-const add = (p, v) => [p[0] + v[0], p[1] + v[1]];
-const f = n => n.toFixed(1);
-
-// Нога: колено находим через простую двухзвенную IK, колено смотрит вперёд (вправо)
-function knee(hip, foot, L = 31) {
-  const vx = foot[0] - hip[0], vy = foot[1] - hip[1], d = Math.hypot(vx, vy);
-  const mid = [(hip[0] + foot[0]) / 2, (hip[1] + foot[1]) / 2];
-  if (d >= 2 * L) return mid;
-  const h = Math.sqrt(L * L - (d / 2) ** 2);
-  let px = -vy / d, py = vx / d;
-  if (px < 0) { px = -px; py = -py; }
-  return [mid[0] + px * h, mid[1] + py * h];
-}
-
-function limb(a, b, c, w, color) {
-  const d = `M${f(a[0])} ${f(a[1])} L${f(b[0])} ${f(b[1])}` + (c ? ` L${f(c[0])} ${f(c[1])}` : '');
-  return `<path d="${d}" stroke="#1b1b1f" stroke-width="${w + 4}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="${d}" stroke="${color}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-}
-
-// Игрок вид сбоку, лицом вправо. Углы в градусах: 0 — вправо, 90 — вверх.
-function figure(o) {
-  const p = Object.assign({ x: 120, w: 32, h: 56, lean: 6, a: [-100, -80, -80], b: [-100, -80], jump: 0, flip: false, col: '#2f6fed' }, o);
-  const skin = '#f2c29b', shorts = '#26262b';
-  const hip = [p.x, G - p.h - p.jump];
-  const fFront = [p.x + p.w / 2 + 4, G - p.jump], fBack = [p.x - p.w / 2, G - p.jump];
-  const kF = knee(hip, fFront), kB = knee(hip, fBack);
-  const tdir = 90 - p.lean;
-  const sh = add(hip, dir(tdir, 44)), neck = add(hip, dir(tdir, 50)), head = add(hip, dir(tdir, 62));
-  const eA = add(sh, dir(p.a[0], 25)), hA = add(eA, dir(p.a[1], 23));
-  const eB = add(sh, dir(p.b[0], 24)), hB = add(eB, dir(p.b[1], 21));
-  const rc = add(hA, dir(p.a[2], 28));
-  const throat = add(hA, dir(p.a[2], 14));
-  let s = '';
-  s += limb(hip, kB, fBack, 7, '#e9e3d6');
-  s += `<path d="M${f(fBack[0]-4)} ${f(fBack[1])} h12" stroke="#1b1b1f" stroke-width="6" stroke-linecap="round"/>`;
-  s += limb(hip, kF, fFront, 7, '#fff');
-  s += `<path d="M${f(fFront[0]-4)} ${f(fFront[1])} h13" stroke="#1b1b1f" stroke-width="6" stroke-linecap="round"/>`;
-  s += limb(hip, add(hip, dir(tdir, 6)), null, 18, shorts);
-  s += limb(eB, hB, null, 5, skin) + limb(sh, eB, null, 6, p.col);
-  s += limb(add(hip, dir(tdir, 8)), add(hip, dir(tdir, 44)), null, 17, p.col);
-  s += `<circle cx="${f(head[0])}" cy="${f(head[1])}" r="11" fill="${skin}" stroke="#1b1b1f" stroke-width="2.5"/>`;
-  // кепка-козырёк в сторону взгляда
-  s += `<path d="M${f(head[0]-11)} ${f(head[1]-2)} A11 11 0 0 1 ${f(head[0]+11)} ${f(head[1]-2)} L${f(head[0]+18)} ${f(head[1]-1)} Z" fill="${p.col}" stroke="#1b1b1f" stroke-width="2"/>`;
-  s += `<circle cx="${f(head[0]+5)}" cy="${f(head[1]+2)}" r="1.6" fill="#1b1b1f"/>`;
-  s += limb(sh, eA, null, 6, p.col) + limb(eA, hA, null, 5, skin);
-  // ракетка: ручка + перфорированная головка
-  s += `<path d="M${f(hA[0])} ${f(hA[1])} L${f(throat[0])} ${f(throat[1])}" stroke="#1b1b1f" stroke-width="5" stroke-linecap="round"/>`;
-  s += `<g transform="translate(${f(rc[0])} ${f(rc[1])}) rotate(${f(-p.a[2])})">
-          <ellipse rx="15" ry="11.5" fill="#ff8a3d" stroke="#1b1b1f" stroke-width="2.5"/>
-          <circle cx="-5" cy="-3" r="1.3" fill="#1b1b1f"/><circle cx="1" cy="-4" r="1.3" fill="#1b1b1f"/><circle cx="6" cy="-1" r="1.3" fill="#1b1b1f"/>
-          <circle cx="-3" cy="3" r="1.3" fill="#1b1b1f"/><circle cx="3" cy="4" r="1.3" fill="#1b1b1f"/></g>`;
-  const ballAt = add(rc, dir(p.a[2], 21));
-  const flipX = x => p.flip ? 2 * p.x - x : x;
-  return { svg: p.flip ? `<g transform="translate(${2 * p.x} 0) scale(-1 1)">${s}</g>` : s,
-           racket: [flipX(ballAt[0]), ballAt[1]], hand: [flipX(hB[0] + 5), hB[1] + 2] };
-}
-
-function court(sc) {
-  let s = `<rect x="0" y="${G}" width="320" height="30" fill="#3a7bd5"/><path d="M0 ${G} H320" stroke="#1b1b1f" stroke-width="3"/>`;
-  if (sc.wall) s += `<rect x="0" y="0" width="16" height="${G}" fill="#bfe3ff" opacity=".75"/><path d="M16 0 V${G}" stroke="#1b1b1f" stroke-width="3"/>
-                     <path d="M5 30 l6 -10 M5 70 l6 -10" stroke="#fff" stroke-width="2"/>`;
-  const nx = sc.net === undefined ? null : sc.net;
-  if (nx !== null) {
-    s += `<path d="M${nx} ${G} V145" stroke="#1b1b1f" stroke-width="4"/>`;
-    for (let y = 150; y < G; y += 8) s += `<path d="M${nx - 3} ${y} h6" stroke="#555" stroke-width="1"/>`;
-    s += `<path d="M${nx - 4} 145 h8" stroke="#fff" stroke-width="4"/><path d="M${nx - 5} 145 h10" stroke="#1b1b1f" stroke-width="1"/>`;
+// сколько тестов и где остановился — чтобы продолжить с главной
+const total = Object.values(SETS).reduce((s, v) => s + v.q.length, 0);
+document.getElementById('acaSub').textContent = `${total} ситуаций, ${Object.keys(SETS).length} источника`.replace(/(\d+) источника$/, (m, n) => n >= 5 ? `${n} источников` : m);
+const st = JSON.parse(localStorage.getItem('padel-tests') || '{}'), last = st.last && SETS[st.last] && st[st.last];
+if (last) {
+  const n = SETS[st.last].q.length, done = Object.keys(last.a || {}).length;
+  if (done && done < n) {
+    const c = document.getElementById('cont');
+    c.href = 'academy.html#' + st.last; c.hidden = false;
+    c.innerHTML = `<span class="i">▶</span><span><b>Продолжить тест</b><br><span>${SETS[st.last].name} — ${done} из ${n}</span></span>`;
   }
-  return s;
 }
-
-const arrowDefs = `<defs><marker id="ah" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#1b1b1f"/></marker>
-  <marker id="ag" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#666"/></marker></defs>`;
-
-function sfx(text, x, y) {
-  return `<g transform="translate(${x} ${y}) rotate(-8)">
-    <path d="M0 -26 L10 -12 L28 -20 L22 -4 L40 2 L22 8 L28 24 L10 14 L0 30 L-8 14 L-28 22 L-20 6 L-40 0 L-20 -6 L-28 -22 L-8 -12 Z" fill="#fff" stroke="#1b1b1f" stroke-width="2.5"/>
-    <text text-anchor="middle" y="6" font-family="Rubik Mono One, Rubik" font-size="13" fill="#e5484d" stroke="#1b1b1f" stroke-width=".6">${text}</text></g>`;
-}
-
-function panel(sc, i) {
-  let s = arrowDefs + court(sc);
-  const me = figure(sc.p);
-  let ball = null;
-  if (sc.ball === 'racket') ball = me.racket;
-  else if (sc.ball === 'hand') ball = me.hand;
-  else if (sc.ball) ball = sc.ball;
-  if (sc.before) s += `<path d="${sc.before(ball)}" fill="none" stroke="#1b1b1f" stroke-width="2" stroke-dasharray="5 5" opacity=".55" marker-end="url(#ah)"/>`;
-  if (sc.after) s += `<path d="${sc.after(ball)}" fill="none" stroke="#1b1b1f" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#ah)"/>`;
-  if (sc.move) s += `<path d="M${sc.move[0]} ${G + 18} H${sc.move[1]}" stroke="#fff" stroke-width="4" marker-end="url(#ag)"/>`;
-  if (sc.opp) s += figure(Object.assign({ col: '#e5484d', flip: true }, sc.opp)).svg;
-  s += me.svg;
-  if (sc.swing) s += `<path d="${sc.swing}" fill="none" stroke="#fff" stroke-width="5" opacity=".9" stroke-linecap="round"/>`;
-  if (ball) s += `<circle cx="${f(ball[0])}" cy="${f(ball[1])}" r="6" fill="#d7f205" stroke="#1b1b1f" stroke-width="2"/>`;
-  if (sc.fx) {
-    const at = sc.fxAt || [ball[0] + 8, ball[1] - 40];
-    s += sfx(sc.fx, Math.min(Math.max(at[0], 50), 275), Math.max(at[1], 34));
-  }
-  return `<div class="panel"><div class="num">${i + 1}</div><svg viewBox="0 0 320 240">${s}</svg><div class="caption">${sc.cap}</div></div>`;
-}
-
-const B = b => `M${f(b[0])} ${f(b[1])}`;
-const SHOTS = [
-  { id: 'serve', name: 'Подача', es: 'saque', when: 'Начинает каждое очко. Подаётся снизу, по диагонали в квадрат соперника.',
-    panels: [
-      { p: { x: 110, w: 26, h: 58, lean: 4, a: [-130, -160, 175], b: [-40, -10] }, ball: 'hand', net: 290,
-        before: b => `${B([b[0], b[1] + 8])} L${f(b[0])} ${G - 8}`, cap: 'Боком к сетке, ноги за линией. Отпусти мяч у передней ноги — он должен отскочить от пола.' },
-      { p: { x: 110, w: 36, h: 48, lean: 14, a: [-75, -30, 5], b: [-30, -60] }, ball: 'racket', net: 290, fx: 'ТУК!',
-        after: b => `${B(b)} Q235 105 318 150`, cap: 'Удар после отскока. Мяч в момент удара — не выше пояса.' },
-      { p: { x: 116, w: 36, h: 54, lean: 8, a: [30, 80, 120], b: [-60, -90] }, net: 290, move: [140, 220],
-        cap: 'Проводка вперёд-вверх — и сразу шаг к сетке.' }],
-    tech: ['Подача — это начало атаки, а не эйс: важнее точность и выход к сетке.', 'Целься в угол «стекло — пол» или в центр, в «Т».', 'Мяч с лёгкой подрезкой отскакивает ниже и неудобнее.', 'Одна нога всегда касается пола, на линию не наступать.'],
-    err: ['Удар выше пояса — ошибка.', 'Сильная подача, после которой остаёшься на задней линии.'] },
-
-  { id: 'drive', name: 'Удар справа', es: 'drive / derecha', when: 'Основной удар с задней линии по мячу после отскока — до стекла или после.',
-    panels: [
-      { p: { x: 120, w: 40, h: 50, lean: 6, a: [-150, 170, 150], b: [-10, 10] }, ball: [215, 168], net: 300, wall: true,
-        before: () => `M318 110 Q260 120 228 162`, cap: 'Плечо к сетке, ракетка назад. Замах короткий — короче теннисного.' },
-      { p: { x: 120, w: 44, h: 46, lean: 12, a: [-70, -20, 0], b: [-40, -120] }, ball: 'racket', net: 300, wall: true, fx: 'ПОК!',
-        after: b => `${B(b)} Q235 118 318 135`, cap: 'Контакт впереди сбоку, колени согнуты, запястье зафиксировано.' },
-      { p: { x: 124, w: 44, h: 50, lean: 8, a: [20, 70, 110], b: [-70, -100] }, net: 300, wall: true,
-        swing: 'M150 175 Q180 160 175 120', cap: 'Проводка по направлению удара, финиш у плеча.' }],
-    tech: ['Работает корпус и ноги, а не кисть.', 'Чаще плоско или с подрезкой: в паделе сильный крученый мяч отскакивает от стекла удобно сопернику.', 'Главные цели — ноги игроков у сетки, центр, или свеча.'],
-    err: ['Теннисный замах «от уха до уха» — не успеваешь.', 'Бить «в стекло» соперника со всей силы: мяч отскочит прямо к нему.'] },
-
-  { id: 'backhand', name: 'Удар слева', es: 'revés', when: 'То же, что удар справа, но с другой стороны. В паделе обычно одной рукой.',
-    panels: [
-      { p: { x: 120, w: 40, h: 50, lean: 6, a: [-110, 175, 140], b: [-115, 168] }, ball: [215, 168], net: 300, wall: true,
-        before: () => `M318 110 Q260 120 228 162`, cap: 'Разворот плеч. Свободная рука держит ракетку за шейку — помогает развернуться.' },
-      { p: { x: 120, w: 44, h: 46, lean: 10, a: [-60, -10, 5], b: [-150, -170] }, ball: 'racket', net: 300, wall: true, fx: 'ТОК!',
-        after: b => `${B(b)} Q235 118 318 135`, cap: 'Удар перед передней ногой, рука почти прямая, лёгкая подрезка.' },
-      { p: { x: 122, w: 44, h: 50, lean: 4, a: [20, 40, 70], b: [-160, -150] }, net: 300, wall: true,
-        cap: 'Финиш вперёд-вверх, грудь раскрывается, вес на передней ноге.' }],
-    tech: ['Свободная рука уходит назад — для баланса.', 'Подрезка делает удар надёжнее и ниже.', 'Если мяч неудобный — лучше пропустить его к стеклу и сыграть после отскока.'],
-    err: ['Бить «из-за спины», когда мяч уже прошёл.', 'Сгибать запястье в момент контакта.'] },
-
-  { id: 'volley', name: 'Воле', es: 'volea', when: 'Удар с лёта у сетки. Главный удар команды, которая владеет сеткой.',
-    panels: [
-      { p: { x: 195, w: 34, h: 50, lean: 10, a: [-50, 40, 80], b: [-40, 30] }, ball: [268, 118], net: 290,
-        before: () => `M318 95 Q295 105 278 115`, cap: 'Готовность: ракетка перед грудью, головка вверх, колени согнуты.' },
-      { p: { x: 195, w: 44, h: 48, lean: 16, a: [-15, 15, 55], b: [-30, -10] }, ball: 'racket', net: 290, fx: 'ТЫЦ!',
-        after: b => `${B(b)} Q302 112 316 205`, cap: 'Шаг навстречу, без замаха: «поймай» мяч ракеткой с подрезкой.' },
-      { p: { x: 200, w: 44, h: 50, lean: 12, a: [-35, -10, 20], b: [-30, -20] }, net: 290,
-        cap: 'Короткое сопровождение. Мяч — в ноги или в центр.' }],
-    tech: ['Ракетка всегда перед телом, её не отводят назад.', 'Удар идёт от плеча, кисть твёрдая.', 'Низкий мяч — колени ниже, ракетка открыта, мяч мягко назад. Высокий — можно сильнее.', 'Позиция — 2–3 метра от сетки.'],
-    err: ['Замах, как в теннисе.', 'Слишком близко к сетке — над тобой легко сыграть свечу.'] },
-
-  { id: 'lob', name: 'Свеча', es: 'globo', when: 'Самый важный удар защиты: высоко над соперниками у сетки — к их заднему стеклу.',
-    panels: [
-      { p: { x: 110, w: 40, h: 44, lean: 10, a: [-120, -150, -160], b: [-20, 0] }, ball: [190, 192], net: 300, wall: true,
-        before: () => `M318 150 Q250 150 202 190`, cap: 'Низкая стойка, ракетка ниже мяча.' },
-      { p: { x: 112, w: 44, h: 44, lean: 6, a: [-80, -60, 20], b: [-40, -60] }, ball: 'racket', net: 300, wall: true, fx: 'ПЛОП',
-        after: b => `${B(b)} Q235 -60 318 80`, cap: 'Открытая ракетка, движение снизу вверх. Высоко и глубоко.' },
-      { p: { x: 116, w: 40, h: 52, lean: 0, a: [50, 85, 100], b: [-80, -100] }, net: 300, wall: true, move: [150, 260],
-        cap: 'Финиш высоко — и сразу всей парой к сетке.' }],
-    tech: ['Не силой, а «поднять» мяч ногами и плечом.', 'Лучше слишком высоко, чем коротко: короткая свеча = смэш соперника.', 'Цель — над левым плечом соперника (над его бэкхендом).', 'Свеча после стекла — основной способ отобрать сетку.'],
-    err: ['Свеча в аут или на середину корта.', 'Остаться сзади после хорошей свечи.'] },
-
-  { id: 'bandeja', name: 'Бандеха', es: 'bandeja («поднос»)', when: 'Ответ на свечу, когда не хочешь отдавать сетку. Контроль, а не добивание.',
-    panels: [
-      { p: { x: 140, w: 38, h: 54, lean: -6, a: [170, 95, 135], b: [70, 75] }, ball: [190, 42], net: 300,
-        before: () => `M318 30 Q240 0 202 38`, cap: 'Боком, свободная рука указывает на мяч, ракетка на уровне головы.' },
-      { p: { x: 146, w: 40, h: 56, lean: 6, a: [65, 40, 15], b: [-80, -100] }, ball: 'racket', net: 300, fx: 'ВЖУХ',
-        after: b => `${B(b)} Q290 70 318 175`, cap: 'Удар сбоку-сверху с подрезкой, контакт впереди.' },
-      { p: { x: 150, w: 40, h: 52, lean: 10, a: [-30, -60, -40], b: [-90, -110] }, net: 300, move: [170, 240],
-        cap: 'Мяч глубоко в угол — и ты снова у сетки.' }],
-    tech: ['Ракетка не опускается за спину — короткая «полка».', 'Мяч бьётся не над головой, а чуть сбоку и впереди.', 'Подрезка: мяч от стекла соперника отскакивает низко.', 'Цель — угол у заднего стекла, чаще к бэкхенду соперника.'],
-    err: ['Пытаться бандехой выиграть очко силой.', 'Бить в середину стекла — мяч возвращается удобно.'] },
-
-  { id: 'vibora', name: 'Вибора', es: 'víbora («гадюка»)', when: 'Атакующая версия бандехи: быстрее, ниже и с боковым вращением.',
-    panels: [
-      { p: { x: 140, w: 38, h: 54, lean: -4, a: [175, 110, 220], b: [65, 80] }, ball: [200, 42], net: 300,
-        before: () => `M318 30 Q245 0 212 38`, cap: 'Как бандеха, но замах глубже: ракетка уходит за спину.' },
-      { p: { x: 146, w: 42, h: 54, lean: 10, a: [55, 20, -5], b: [-90, -120] }, ball: 'racket', net: 300, fx: 'ВЖЖ!',
-        after: b => `${B(b)} Q280 95 318 165`, cap: 'Удар сбоку, режем мяч по краю — сильное боковое вращение.' },
-      { p: { x: 150, w: 42, h: 50, lean: 18, a: [-60, -110, -150], b: [-100, -130] }, net: 300,
-        cap: 'Рука проходит через тело вниз. Мяч жмётся к боковому стеклу.' }],
-    tech: ['Контакт ниже и правее, чем в бандехе.', 'Мяч после бокового стекла почти не отскакивает — сложно вернуть.', 'Играть, когда мяч чуть ниже и ты стоишь уверенно.'],
-    err: ['Вибора с неудобного мяча — больше ошибок, чем очков.', 'Забыть вернуться к сетке.'] },
-
-  { id: 'smash', name: 'Смэш', es: 'remate · por 3 · por 4', when: 'Добивающий удар по высокому мячу. Вершина — вылет за пределы корта.',
-    panels: [
-      { p: { x: 130, w: 36, h: 52, lean: -8, a: [175, 100, -100], b: [75, 80] }, ball: [178, 22], net: 300,
-        before: () => `M318 20 Q240 -10 190 18`, cap: '«Трофей»: боком, рука на мяч, ракетка за спиной.' },
-      { p: { x: 140, w: 30, h: 58, lean: 4, jump: 10, a: [80, 65, 50], b: [-60, -80] }, ball: 'racket', net: 300, fx: 'БАХ!!', fxAt: [250, 60],
-        after: b => `${B(b)} Q270 70 312 205`, cap: 'Удар в высшей точке, рука полностью выпрямлена.' },
-      { p: { x: 150, w: 40, h: 50, lean: 22, a: [-40, -80, -110], b: [-110, -130] }, net: 300,
-        cap: '«Por 3» — мяч улетает через стенку; «por 4» — вбок через дверь.' }],
-    tech: ['Смэш — только по удобному мячу недалеко от сетки.', 'Плоский смэш — в пол между соперниками или в ноги.', 'Por 3: сильный крученый в пол у задней линии соперника, мяч отскакивает за 3-метровую стенку.', 'Мяч из-за спины лучше сыграть бандехой.'],
-    err: ['Смэш с задней половины корта — мяч вернётся от стекла.', 'Бить смэш по любой свече.'] },
-
-  { id: 'wall', name: 'Выход со стекла', es: 'salida de pared', when: 'Мяч ударился о заднее стекло — играешь после отскока от него. Главная «падельная» техника.',
-    panels: [
-      { p: { x: 150, w: 36, h: 54, lean: 4, flip: true, a: [-60, 20, 70], b: [-40, -20] }, ball: [82, 168], wall: true, net: 310,
-        before: () => `M300 80 Q170 110 94 165`, cap: 'Мяч прошёл мимо: развернись и отойди вместе с ним, не прижимаясь к стеклу.' },
-      { p: { x: 88, w: 36, h: 46, lean: 8, a: [-150, 170, 150], b: [-20, 0] }, ball: [150, 168], wall: true, net: 310,
-        before: () => `M16 120 Q70 120 140 166`, cap: 'Мяч отскочил от стекла — жди, когда он выйдет вперёд и начнёт падать.' },
-      { p: { x: 100, w: 44, h: 44, lean: 12, a: [-70, -20, 5], b: [-40, -120] }, ball: 'racket', wall: true, net: 310, fx: 'ПОК!',
-        after: b => `${B(b)} Q220 20 318 100`, cap: 'Удар перед собой. Обычно — свеча или чикита, а не сила.' }],
-    tech: ['Стой боком к стеклу, а не лицом к нему.', 'Двигайся вместе с мячом, чтобы он оказался перед тобой.', 'Мяч после стекла теряет скорость — не торопись.', 'Ноги работают маленькими шагами.'],
-    err: ['Бежать к стеклу и оказываться в нём «зажатым».', 'Бить по мячу, который ещё поднимается.'] },
-
-  { id: 'chiquita', name: 'Чикита', es: 'chiquita', when: 'Мягкий медленный мяч в ноги соперникам у сетки. Им приходится бить снизу вверх.',
-    panels: [
-      { p: { x: 90, w: 42, h: 44, lean: 12, a: [-120, -160, -170], b: [-30, -10] }, ball: [160, 182], net: 220,
-        opp: { x: 280, w: 34, h: 50, lean: 10, a: [-50, 40, 80], b: [-40, 30] },
-        before: () => `M255 110 Q200 140 170 178`, cap: 'Соперники у сетки. Короткий замах, ноги согнуты.' },
-      { p: { x: 94, w: 44, h: 42, lean: 14, a: [-75, -40, 10], b: [-40, -90] }, ball: 'racket', net: 220, fx: 'тюк',
-        opp: { x: 280, w: 34, h: 50, lean: 10, a: [-50, 40, 80], b: [-40, 30] },
-        after: b => `${B(b)} Q190 55 250 206`, cap: 'Мягко и медленно, низко над сеткой — в ноги.' },
-      { p: { x: 100, w: 40, h: 46, lean: 8, a: [-30, 10, 40], b: [-60, -100] }, net: 220, move: [120, 190],
-        opp: { x: 280, w: 44, h: 36, lean: 28, a: [-80, -100, -120], b: [-60, -30] }, ball: [248, 196],
-        cap: 'Соперник бьёт снизу вверх — а ты выходишь к сетке.' }],
-    tech: ['Важна мягкость, а не скорость: мяч должен падать после сетки.', 'Лучшая цель — в ноги или между соперниками.', 'Сыграл чикиту — сделай шаг вперёд.'],
-    err: ['Чикита высоко — это готовый мяч для воле.', 'Играть чикиту и стоять на месте.'] },
-
-  { id: 'bajada', name: 'Бахада', es: 'bajada de pared', when: 'Высокий мяч отскочил от заднего стекла — бьёшь сверху и превращаешь защиту в атаку.',
-    panels: [
-      { p: { x: 78, w: 36, h: 56, lean: -6, a: [170, 95, 135], b: [70, 75] }, ball: [64, 40], wall: true, net: 310,
-        before: () => `M300 5 Q120 25 40 205 Q26 170 16 130 Q22 80 58 46`, cap: 'Высокий мяч ударился о заднее стекло и отлетает высоко.' },
-      { p: { x: 80, w: 40, h: 56, lean: 6, a: [65, 40, 15], b: [-80, -100] }, ball: 'racket', wall: true, net: 310, fx: 'ХЛОП!',
-        after: b => `${B(b)} Q250 60 318 190`, cap: 'Отойди от стекла вместе с мячом и бей сверху, как бандеху или смэш.' },
-      { p: { x: 92, w: 40, h: 52, lean: 14, a: [-30, -60, -40], b: [-90, -110] }, wall: true, net: 310, move: [120, 220],
-        cap: 'Мяч летит вниз и глубоко — можно выходить вперёд.' }],
-    tech: ['Нужно чувство расстояния: ждать, пока мяч выйдет от стекла.', 'Бить сбоку, рука указывает на мяч, как в бандехе.', 'Направление — в ноги или в угол, не в стекло.'],
-    err: ['Бить слишком рано, у самого стекла.', 'Силой «в никуда»: мяч всё равно вернётся.'] },
-];
-
-// --- сборка ударов ---
-const nav = document.getElementById('nav');
-const shotsEl = document.getElementById('shots');
-SHOTS.forEach(sh => {
-  nav.insertAdjacentHTML('beforeend', `<a href="#${sh.id}">${sh.name}</a>`);
-  shotsEl.insertAdjacentHTML('beforeend', `<section class="shot" id="${sh.id}">
-    <h2>${sh.name.toUpperCase()} <small>(${sh.es})</small></h2><p class="when">${sh.when}</p>
-    <div class="strip">${sh.panels.map(panel).join('')}</div>
-    <div class="notes"><div class="card"><h4>Техника</h4><ul>${sh.tech.map(t => `<li>${t}</li>`).join('')}</ul></div>
-    <div class="card err"><h4>Частые ошибки</h4><ul>${sh.err.map(t => `<li>${t}</li>`).join('')}</ul></div></div></section>`);
-});
-nav.insertAdjacentHTML('beforeend', `<a href="#tactics">⭐ Тактика</a><a href="#drills">Тренировка</a><a href="#github">GitHub</a><a href="rules.html">📜 Правила</a><a href="score.html">🎾 Счёт</a><a href="ref.html">📚 Справка</a><a href="academy.html">🎓 Академия</a><a href="tournament.html">🏆 Турнир</a>`);
-
-// --- тактические схемы: корт сверху, 20 px = 1 м ---
-const CX = x => 10 + x, CY = y => 15 + y;
-function courtTop(body) {
-  let s = `<defs><marker id="tb" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#d7f205" stroke="#1b1b1f"/></marker>
-    <marker id="tg" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#ddd"/></marker></defs>`;
-  s += `<rect x="${CX(0)}" y="${CY(0)}" width="400" height="200" fill="#2f7de1" stroke="#cfe8ff" stroke-width="5"/>`;
-  s += `<path d="M${CX(71)} ${CY(0)} V${CY(200)} M${CX(349)} ${CY(0)} V${CY(200)} M${CX(71)} ${CY(100)} H${CX(349)}" stroke="#fff" stroke-width="2"/>`;
-  s += `<path d="M${CX(200)} ${CY(-6)} V${CY(206)}" stroke="#fff" stroke-width="4"/><path d="M${CX(200)} ${CY(-6)} V${CY(206)}" stroke="#1b1b1f" stroke-width="1" stroke-dasharray="3 3"/>`;
-  return s + body;
-}
-const pl = (x, y, team, t) => `<circle cx="${CX(x)}" cy="${CY(y)}" r="11" fill="${team === 'a' ? '#2f6fed' : '#e5484d'}" stroke="#1b1b1f" stroke-width="2.5"/>
-  <text x="${CX(x)}" y="${CY(y) + 4.5}" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">${t}</text>`;
-const ballPath = d => `<path d="${d}" fill="none" stroke="#d7f205" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#tb)"/>`;
-const mv = (x1, y1, x2, y2) => `<path d="M${CX(x1)} ${CY(y1)} L${CX(x2)} ${CY(y2)}" stroke="#ddd" stroke-width="3" marker-end="url(#tg)"/>`;
-const zone = (x, w, label) => `<rect x="${CX(x)}" y="${CY(0)}" width="${w}" height="200" fill="#fff" opacity=".16"/><text x="${CX(x + w / 2)}" y="${CY(193)}" text-anchor="middle" font-size="11" fill="#fff" font-weight="600">${label}</text>`;
-const lbl = (x, y, t) => `<text x="${CX(x)}" y="${CY(y)}" text-anchor="middle" font-size="12" font-weight="800" fill="#fff" stroke="#1b1b1f" stroke-width=".5">${t}</text>`;
-const P = (x, y) => `${CX(x)} ${CY(y)}`;
-
-const TACTICS = [
-  { t: '1. Кто у сетки — тот диктует', s: zone(140, 60, 'зона атаки') + pl(160, 55, 'a', 'A') + pl(160, 145, 'a', 'B') + pl(380, 55, 'b', '') + pl(380, 145, 'b', ''),
-    p: 'Главная идея падела: пара у сетки (2–3 м от неё) выигрывает большинство очков. Вся игра — борьба за эту позицию. Пара сзади защищается и ищет момент, чтобы отобрать сетку.' },
-  { t: '2. Свеча — пропуск к сетке', s: pl(30, 60, 'a', 'A') + pl(30, 150, 'a', 'B') + pl(250, 60, 'b', '') + pl(250, 150, 'b', '') +
-      ballPath(`M${P(42, 60)} Q${P(230, -60)} ${P(385, 40)}`) + mv(45, 75, 150, 75) + mv(45, 165, 150, 165) + mv(265, 60, 350, 60) + mv(265, 150, 350, 150),
-    p: 'Соперники у сетки — бей свечу над ними к их заднему стеклу. Пока они бегут назад, вы оба выходите вперёд. Позиции поменялись: теперь атакуете вы.' },
-  { t: '3. Играй в центр', s: pl(160, 55, 'a', 'A') + pl(160, 145, 'a', 'B') + pl(260, 50, 'b', '') + pl(260, 150, 'b', '') +
-      ballPath(`M${P(170, 60)} L${P(300, 100)}`) + lbl(300, 128, '«Твой!» — «Мой!»'),
-    p: 'Мяч между соперниками создаёт сомнение, кому бить, и не даёт острого угла для ответа. Центр — самый безопасный и при этом неприятный адрес.' },
-  { t: '4. Пара «на верёвке»', s: `<path d="M${P(150, 50)} L${P(150, 130)}" stroke="#fff" stroke-width="2" stroke-dasharray="2 4"/>` +
-      pl(150, 50, 'a', 'A') + pl(150, 130, 'a', 'B') + mv(150, 62, 150, 85) + mv(150, 142, 150, 170) + pl(330, 175, 'b', '') + pl(260, 60, 'b', '') +
-      ballPath(`M${P(320, 170)} Q${P(250, 190)} ${P(180, 180)}`),
-    p: 'Партнёры двигаются вместе: оба вперёд, оба назад, оба в сторону мяча, держа 3–4 м между собой. Дыра между игроками — первое, куда бьёт хороший соперник.' },
-  { t: '5. Бандеха вместо смэша', s: pl(155, 55, 'a', 'A') + pl(160, 145, 'a', 'B') + pl(380, 60, 'b', '') + pl(380, 150, 'b', '') +
-      mv(155, 67, 125, 67) + ballPath(`M${P(120, 55)} Q${P(270, 0)} ${P(390, 15)}`) + `<path d="M${P(130, 80)} Q${P(140, 100)} ${P(158, 80)}" stroke="#ddd" stroke-width="3" fill="none" marker-end="url(#tg)"/>`,
-    p: 'Против свечи, которая заставила отступить: отойди на пару шагов, сыграй бандеху глубоко в угол — и вернись к сетке. Смэш оставь для лёгких высоких мячей у сетки.' },
-  { t: '6. Чикита против сетки', s: pl(40, 60, 'a', 'A') + pl(40, 150, 'a', 'B') + pl(245, 60, 'b', '') + pl(245, 150, 'b', '') +
-      ballPath(`M${P(52, 140)} Q${P(180, 120)} ${P(228, 132)}`) + mv(55, 75, 130, 75) + mv(55, 165, 130, 165),
-    p: 'Не можешь сыграть свечу — играй мягко в ноги сеточникам. Им придётся поднимать мяч, а вы сможете подойти ближе. Сила против пары у сетки почти всегда проигрывает.' },
-];
-document.getElementById('tacticsGrid').innerHTML = TACTICS.map(t =>
-  `<div class="tactic"><h3>${t.t}</h3><svg viewBox="0 0 420 230">${courtTop(t.s)}</svg><p>${t.p}</p></div>`).join('');
 </script>
 </body>
 </html>

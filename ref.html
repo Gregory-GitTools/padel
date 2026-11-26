@@ -31,7 +31,7 @@
 </head>
 <body>
 <nav class="top">
-  <div class="logo"><span class="dot"></span>ПАДЕЛ</div>
+  <a class="logo" href="index.html"><span class="dot"></span>ПАДЕЛ</a>
   <div class="tabs"><a href="rules.html"><span>📜</span>Правила</a><a href="score.html"><span>🎾</span>Счёт</a><a href="ref.html" class="on"><span>📚</span>Справка</a><a href="academy.html"><span>🎓</span>Академия</a><a href="tournament.html"><span>🏆</span>Турнир</a></div>
 </nav>
 <main class="page">
@@ -142,7 +142,7 @@ const ids = () => sect === 'terms'
 function render() {
   reader.stop();
   $('count').textContent = sect === 'terms' ? `${TERMS.length} слов, которые слышно на корте.` : `${SHOTS.length} ударов — по-русски, по-испански, по-английски. Нажми на удар — раскроется.`;
-  $('sect').innerHTML = `<button data-s="shots" class="${sect === 'shots' ? 'on' : ''}">🎾 Удары</button><button data-s="terms" class="${sect === 'terms' ? 'on' : ''}">💬 Термины</button><a href="index.html">🖼 Комикс</a>`;
+  $('sect').innerHTML = `<button data-s="shots" class="${sect === 'shots' ? 'on' : ''}">🎾 Удары</button><button data-s="terms" class="${sect === 'terms' ? 'on' : ''}">💬 Термины</button><a href="comic.html">🖼 Комикс</a>`;
   $('chips').innerHTML = sect === 'terms' ? '' : [['all', 'Все'], ...Object.entries(GROUPS)].map(([k, n]) => `<button class="${filter === k ? 'on' : ''}" data-f="${k}">${n}</button>`).join('');
   $('chips').hidden = sect === 'terms';
   const list = ids();
@@ -161,7 +161,7 @@ function render() {
         <div class="t"><b>${s[2]}</b><i><u>ES</u> ${s[3]} · <u>EN</u> ${s[11]}</i><span class="lvl l${s[4]}">${LVL[s[4]]}</span><span class="one">${s[6]}</span></div>
         <button class="spk" data-say="${id}" aria-label="Озвучить">🔊</button></div>
       <div class="body"><div class="row3"><div class="w">${s[7]}</div><div class="k">${s[8]}</div><div class="e">${s[9]}</div></div>
-        ${s[10] ? `<a class="more" href="index.html#${s[10]}">Комикс по кадрам →</a>` : ''}</div></article>`;
+        ${s[10] ? `<a class="more" href="comic.html#${s[10]}">Комикс по кадрам →</a>` : ''}</div></article>`;
   }
   $('list').innerHTML = h || `<div class="empty">Ничего не нашлось. Попробуй по-испански или по-английски.</div>`;
 }

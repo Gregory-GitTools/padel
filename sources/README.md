@@ -43,5 +43,21 @@
 - [Правила за 5 минут](https://youtu.be/5-p0Ea-Q7O4) — подача, розыгрыш, игра с лёта, счёт.
 - Ещё: [подача](https://youtu.be/irQFXcJgSdo), [смэш](https://youtu.be/0pw5agmdvBM), [слайс за 5 минут](https://youtu.be/slpBX5Npojc), [гайд с нуля](https://youtu.be/kmOHQz0sdvM).
 
+### Padel Drive — https://www.youtube.com/@padeldriver
+
+Тренер на английском, разборы с Hugo Cases. 12 ситуаций набора «Padel Drive» в [Академии](../academy.html) — по главам роликов, ссылки ведут на нужную минуту:
+
+- [The 5 Mistakes 80% Padel Players Don't Even Realise](https://youtu.be/mss17lKddCI) — подал и стоишь, мяч от стекла за спиной, бандеха с сильным отскоком.
+- [The 3 Shots That Win 70% Points](https://youtu.be/P4iDbIIaye8) — подача с резаным, приём «просто верни», первое воле.
+- [5 Rules I Wish I Knew When I Started](https://youtu.be/rXUYiZkS5E0) — не менять направление у сетки, не резать сзади, атака или защита.
+- [Контрапаред](https://youtu.be/NfJiVCir0B4), [укороченный](https://youtu.be/dLH6SsNeK7I), [5 простых советов](https://youtu.be/8WXlT6bOGZY) — скорость и запас на лёгком мяче.
+- Ещё не разобраны: [2 удара решают 80% матчей](https://youtu.be/46vLTaxjk_E), [Stop playing safe](https://youtu.be/JrG9KoStIBU), [6 советов](https://youtu.be/RGD4wpcidDc), [Тактика, эп. 1](https://youtu.be/cvKXciBpXA4).
+
+### Просто Падел — https://www.youtube.com/channel/UChvWeYjapYz-afKmJkLH-_w
+
+Разборы с тренером на русском, для новичков. Глав в роликах нет — 6 ситуаций набора «Просто Падел» по описаниям:
+[подача](https://youtu.be/I0ARR_SkTuk), [волей](https://youtu.be/EUY9Xom8OGw), [игра от стекла](https://youtu.be/UyfCtjb-YXc), [свеча](https://youtu.be/DhOYYT1D108), [бандеха](https://youtu.be/fFC5aPBGKqU), [бэкхенд](https://youtu.be/w2fdzkhQCYI).
+Ещё есть: [форхенд](https://youtu.be/YrghDb89glI), [бахада](https://youtu.be/5LxsJ1UUvwg), [ганчо](https://youtu.be/tulpc7IacGo).
+
 ### Padel Chess — https://www.facebook.com/profile.php?id=61586022092935
 Страница в Facebook, без входа не открывается. Ждёт разбора.
