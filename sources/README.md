@@ -43,6 +43,10 @@
 - [Правила за 5 минут](https://youtu.be/5-p0Ea-Q7O4) — подача, розыгрыш, игра с лёта, счёт.
 - Ещё: [подача](https://youtu.be/irQFXcJgSdo), [смэш](https://youtu.be/0pw5agmdvBM), [слайс за 5 минут](https://youtu.be/slpBX5Npojc), [гайд с нуля](https://youtu.be/kmOHQz0sdvM).
 
+### Статьи
+
+- [Смэш в паделе — padel.ru](https://padel.ru/blog/obuchenie/smesh-v-padel-kak-pravilno-bit-smesh-i-atakuyushhij-udar-smesh/) — когда смэш не нужен (стекло вернёт мяч), кик-смэш, «по 3» и «по 4». По ней дописан смэш в Справке и комиксе.
+
 ### Padel Drive — https://www.youtube.com/@padeldriver
 
 Тренер на английском, разборы с Hugo Cases. 12 ситуаций набора «Padel Drive» в [Академии](../academy.html) — по главам роликов, ссылки ведут на нужную минуту:
