@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08111f">
+<title>Падел — тренировка</title>
+<link rel="stylesheet" href="app.css">
+<style>
+  .card { display:grid; grid-template-columns:44px 1fr auto; gap:12px; align-items:start; padding:14px 12px 14px 14px; }
+  .card .n { font-family:Unbounded; font-weight:900; font-size:20px; color:var(--ball); text-align:center; padding-top:2px; }
+  .card b { display:block; font-size:19px; line-height:1.25; }
+  .card p { margin:6px 0 0; font-size:17px; line-height:1.45; color:#d6e0f3; }
+  .card .meta { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .card .meta span { font-size:15px; font-weight:800; padding:3px 10px; border-radius:999px; background:rgba(255,255,255,.08); color:var(--dim); }
+  .card .meta .l1 { color:#7ee2a8; } .card .meta .l2 { color:#7fd3ff; } .card .meta .l3 { color:#ff9a8a; }
+  .card .look { color:var(--ball); font-weight:700; }
+  .card .src { display:inline-block; margin-top:8px; color:var(--dim); font-size:16px; font-weight:700; text-decoration:none; }
+  .card.now { border-color:var(--ball); box-shadow:0 0 0 2px rgba(215,242,5,.35) inset; }
+  .card.done { opacity:.55; }
+  .goal { color:var(--dim); font-size:17px; font-weight:700; margin:0 0 12px; }
+  /* разминка по таймеру */
+  .warm { border:1px solid var(--line); border-radius:20px; padding:16px; margin:0 0 14px; background:linear-gradient(135deg, rgba(215,242,5,.12), rgba(215,242,5,.02)); }
+  .warm .big { width:100%; padding:18px; font-size:20px; border-radius:16px; }
+  .warm .step { color:var(--dim); font-weight:800; font-size:16px; }
+  .warm h2 { font-family:Unbounded; font-size:24px; margin:6px 0; line-height:1.2; }
+  .warm .how { font-size:18px; line-height:1.45; color:#d6e0f3; margin:0 0 10px; }
+  .warm .clock { font-family:Unbounded; font-weight:900; font-size:64px; text-align:center; color:var(--ball); line-height:1.1; margin:4px 0 8px; font-variant-numeric:tabular-nums; }
+  .warm .prog { height:8px; border-radius:8px; background:rgba(255,255,255,.1); overflow:hidden; margin-bottom:12px; }
+  .warm .prog i { display:block; height:100%; background:var(--ball); width:0; }
+  .warm .ctl { display:flex; gap:10px; }
+  .warm .ctl button { min-width:60px; padding:14px; font-size:18px; border-radius:14px; }
+  .warm .ctl .grow { flex:1; }
+</style>
+</head>
+<body>
+<nav class="top">
+  <a class="logo" href="index.html"><span class="dot"></span>ПАДЕЛ</a>
+  <div class="tabs"><a href="rules.html"><span>📜</span>Правила</a><a href="score.html"><span>🎾</span>Счёт</a><a href="ref.html"><span>📚</span>Справка</a><a href="academy.html"><span>🎓</span>Академия</a><a href="training.html" class="on"><span>🏃</span>Тренинг</a><a href="tournament.html"><span>🏆</span>Турнир</a></div>
+</nav>
+<main class="page">
+  <section class="hero">
+    <h1>Тренировка — <span>разминка и упражнения</span></h1>
+    <p>Разминка по таймеру с голосом. Упражнения по задачам — от простого к игре.</p>
+  </section>
+  <div class="chips wrap" id="chips"></div>
+  <div id="top"></div>
+  <div class="bar" id="bar"></div>
+  <div id="list"></div>
+</main>
+
+<script src="voice.js"></script>
+<script src="tests.js"></script>
+<script src="reader.js"></script>
+<script>
+// Разминка: [название, секунды, как делать]
+const WARM = [
+  ['Лёгкий бег вокруг корта', 120, 'Спокойно, вдоль стёкол. Дыхание ровное.'],
+  ['Приставные шаги', 60, 'Вдоль сетки туда и обратно, лицом к сетке. Колени чуть согнуты.'],
+  ['Спиной назад, бегом вперёд', 60, 'От сетки к заднему стеклу спиной, обратно лицом. Как уход под свечу.'],
+  ['Плечи и руки', 60, 'Круги плечами, махи руками, круги кистями — вперёд и назад.'],
+  ['Повороты корпуса', 45, 'Ноги на ширине плеч, разворот влево и вправо, руки свободно.'],
+  ['Выпады с поворотом', 60, 'Шаг в выпад и поворот корпуса к передней ноге. Ноги по очереди.'],
+  ['Сплит-степ и рывок', 60, 'Подскок на месте — и два быстрых шага в сторону. Каждый раз в другую.'],
+  ['Удары без мяча', 90, 'Справа, слева, воле, бандеха. Медленно, с разворотом плеч.'],
+  ['Мини-падел у сетки', 180, 'С партнёром в квадратах подачи. Мягко, мяч не выше пояса.'],
+  ['Воле и свечи', 180, 'Один у сетки играет с лёта, другой сзади. Потом свечи — бандеха вполсилы. Меняйтесь.'],
+  ['Подачи', 60, 'Каждый по пять подач в обе стороны.'],
+];
+// Упражнения: [группа, название, минут, кто (1 — один, 2 — с партнёром), уровень 1–3, задача, как, на что смотреть, видео, секунда]
+const DRILLS = [
+  ['serve', 'Отскок и пояс', 5, 1, 1, 'Правильная подача', 'Отбей мяч в пол сбоку и чуть впереди, бей ниже пояса. 20 подач без цели.', 'Мяч ниже пояса, ноги за линией.'],
+  ['serve', 'Подача в зоны', 10, 1, 1, 'Точность подачи', 'Положи полотенце в угол у стекла и у «Т». По 10 подач в каждую зону.', 'Цель — 6 из 10. С резаным, глубоко.', 'P4iDbIIaye8', 126],
+  ['serve', 'Просто верни', 10, 2, 1, 'Надёжный приём', 'Партнёр подаёт, ты 20 раз принимаешь по диагонали в его половину.', 'Ни одного аута. Скорость не важна.', 'P4iDbIIaye8', 271],
+  ['serve', 'Подал — к сетке', 10, 2, 2, 'Выход к сетке', 'Подача, партнёр принимает в центр. Ты бежишь вперёд и играешь первое воле глубоко.', 'Сплит-степ в момент приёма.', 'P4iDbIIaye8', 474],
+  ['net', 'Ракетка перед грудью', 5, 2, 1, 'Воле без замаха', 'Партнёр набрасывает рукой с трёх метров. Подставь ракетку перед собой и направь мяч ему в руки.', 'Ракетка не уходит за спину.'],
+  ['net', 'Мини-падел', 10, 2, 1, 'Контроль и мягкость', 'Оба у сетки, играете только в квадратах подачи. Мяч не выше пояса.', 'Колени согнуты, удары короткие.'],
+  ['net', 'Воле в ноги', 10, 2, 2, 'Глубина воле', 'Партнёр сзади бьёт тебе, ты у сетки. Воле глубоко ему в ноги. Три серии по 10.', 'Мяч низко над сеткой и глубоко.'],
+  ['net', 'Мяч в тело', 5, 2, 2, 'Защита у сетки', 'Партнёр бьёт средней силой тебе в грудь. Блок слева, ракетка перед грудью.', 'Не уворачиваться.', 'l9Ot7symHqU', 266],
+  ['net', 'Укороченный по сигналу', 10, 2, 3, 'Укороченный', 'Партнёр сзади. Как только он отходит к стеклу — укороченный сразу за сетку.', 'Замах как для обычного воле: прячь удар.', 'dLH6SsNeK7I', 226],
+  ['over', 'Трофей', 5, 1, 1, 'Позиция над головой', 'Без мяча: боком, левая рука вверх на мяч, ракетка за головой. 10 раз, потом приставными назад — и снова.', 'Боком, а не грудью к сетке.', 'mss17lKddCI', 206],
+  ['over', 'Бандеха с наброса', 10, 2, 2, 'Бандеха под контролем', 'Партнёр набрасывает свечи рукой. Бандеха с подрезкой в угол у бокового стекла — и шаг к сетке.', 'Мяч гаснет у стекла, а не отлетает.', 'mss17lKddCI', 579],
+  ['over', 'Бандеха или смэш?', 10, 2, 3, 'Выбор удара', 'Партнёр даёт свечи разной длины. Короткая — смэш в пол между вами, глубокая — бандеха. Называй вслух до удара.', 'Не уверен — бандеха.'],
+  ['wall', 'Поймай отскок', 5, 1, 1, 'Читать стекло', 'Брось мяч в пол так, чтобы он ушёл в заднее стекло. Поймай рукой перед собой. Потом — от двух стёкол в углу.', 'Иди вместе с мячом, не стой у стекла.', 'UyfCtjb-YXc'],
+  ['wall', 'Бросок — удар', 10, 1, 1, 'Выход со стекла', 'Сам бросаешь мяч в стекло и бьёшь после выхода — плоско через сетку. 20 раз справа, 20 слева.', 'Удар перед собой, не за спиной.', 'mss17lKddCI', 481],
+  ['wall', 'Бахада', 10, 2, 3, 'Атака со стекла', 'Партнёр свечой в заднее стекло. Мяч выходит высоко — бей сверху вниз, медленно в центр.', 'Ракетка выше мяча.', 'q14sq5ky1f0'],
+  ['def', 'Свеча — и вперёд', 10, 2, 1, 'Захват сетки', 'Ты сзади, партнёр у сетки. Свеча над ним в угол — и бегом к сетке.', 'Свеча высокая и глубокая.', 'DhOYYT1D108'],
+  ['def', 'Плоско и низко', 10, 2, 2, 'Защита сзади', 'Партнёр у сетки бьёт тебе в разные стороны. Возвращай плоско и низко, в центр.', 'Без резаного и без силы.', 'rXUYiZkS5E0', 200],
+  ['def', 'Чикита в ноги', 10, 2, 2, 'Мягкий удар снизу', 'Партнёр у сетки. Медленный мяч ему в ноги — и сам шаг вперёд.', 'Мяч падает у его ног, ниже сетки.', '7CqmDPh5lYY'],
+  ['feet', 'Сплит-степ', 5, 2, 1, 'Старт к мячу', 'Партнёр замахивается и показывает сторону. В момент «удара» — подскок, потом рывок туда.', 'Приземлился — и сразу шаг.', 'P4iDbIIaye8', 490],
+  ['feet', 'Звезда', 5, 1, 1, 'Скорость на корте', 'Из центра у сетки к четырём точкам: два угла у сетки, два у заднего стекла. Каждый раз назад в центр.', 'Назад — боком, не спиной.'],
+  ['feet', 'На одной верёвке', 10, 2, 2, 'Движение парой', 'Третий кричит «свеча» — оба отходите назад, «вперёд» — оба к сетке.', 'Двигаетесь вместе, расстояние не меняется.'],
+];
+const GROUPS = { warm:'Разминка', serve:'Подача и приём', net:'У сетки', over:'Над головой', wall:'Стекло', def:'Защита', feet:'Ноги' };
+const LVL = ['', 'новичок', 'средний', 'продвинутый'];
+const WHO = ['', '👤 один', '👥 с партнёром'];
+const $ = id => document.getElementById(id);
+const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+const durSay = s => s === 90 ? 'полторы минуты' : s < 60 ? s + ' секунд' : s === 60 ? 'минута' : s / 60 + ' минуты';
+const total = WARM.reduce((s, w) => s + w[1], 0);
+let filter = location.hash.slice(1) in GROUPS ? location.hash.slice(1) : 'warm';
+
+const ids = () => filter === 'warm' ? WARM.map((_, i) => 'w' + i) : DRILLS.map((d, i) => 'd' + i).filter(id => DRILLS[+id.slice(1)][0] === filter);
+const text = id => {
+  const i = +id.slice(1);
+  if (id[0] === 'w') { const w = WARM[i]; return `${w[0]}. ${w[2]} ${durSay(w[1])}.`; }
+  const d = DRILLS[i]; return `${d[1]}. ${d[6]} Смотри: ${d[7]}`;
+};
+
+function render() {
+  reader.stop(); stopWarm(true);
+  $('chips').innerHTML = Object.entries(GROUPS).map(([k, n]) => `<button class="${filter === k ? 'on' : ''}" data-f="${k}">${n}</button>`).join('');
+  let h = '';
+  if (filter === 'warm') {
+    $('top').innerHTML = `<div class="warm" id="warm"><p class="goal">${WARM.length} упражнений · ${Math.round(total / 60)} мин. Телефон сам скажет, что делать.</p>
+      <button class="primary big" id="wgo">▶ Начать разминку</button></div>`;
+    WARM.forEach((w, i) => { h += `<article class="card" id="w${i}"><span class="n">${i + 1}</span><div><b>${w[0]}</b><div class="meta"><span>⏱ ${mmss(w[1])}</span></div><p>${w[2]}</p></div>
+      <button class="spk" data-say="w${i}" aria-label="Озвучить">🔊</button></article>`; });
+  } else {
+    const n = ids().length;
+    $('top').innerHTML = `<p class="goal">${n} упражнения — от простого к игровому. Делай по порядку.</p>`;
+    ids().forEach((id, k) => {
+      const d = DRILLS[+id.slice(1)];
+      const src = d[8] ? `<a class="src" href="https://youtu.be/${d[8]}${d[9] ? '?t=' + d[9] : ''}" target="_blank" rel="noopener">▶ ${VID[d[8]]}${d[9] ? ' · ' + mmss(d[9]) : ''}</a>` : '';
+      h += `<article class="card" id="${id}"><span class="n">${k + 1}</span><div><b>${d[1]}</b>
+        <div class="meta"><span class="l${d[4]}">${LVL[d[4]]}</span><span>⏱ ${d[2]} мин</span><span>${WHO[d[3]]}</span></div>
+        <p><b style="display:inline;font-size:17px">${d[5]}.</b> ${d[6]}</p><p class="look">👁 ${d[7]}</p>${src}</div>
+        <button class="spk" data-say="${id}" aria-label="Озвучить">🔊</button></article>`;
+    });
+  }
+  $('list').innerHTML = h;
+}
+
+// разминка по таймеру: голос объявляет упражнение, часы считают, в конце — следующее
+let wi = 0, left = 0, ticking = null, paused = false, lock = null;
+function warmUI() {
+  const w = WARM[wi];
+  $('warm').innerHTML = `<div class="step">Упражнение ${wi + 1} из ${WARM.length}</div><h2>${w[0]}</h2><p class="how">${w[2]}</p>
+    <div class="clock" id="clock">${mmss(left)}</div><div class="prog"><i style="width:${(1 - left / w[1]) * 100}%"></i></div>
+    <div class="ctl"><button id="wprev" aria-label="Предыдущее">${CHEV(-1)}</button><button class="primary grow" id="wpause">${paused ? '▶ Дальше' : '❚❚ Пауза'}</button>
+    <button id="wnext" aria-label="Следующее">${CHEV(1)}</button><button id="wstop" aria-label="Закончить">■</button></div>`;
+  document.querySelectorAll('#list .card').forEach((c, i) => { c.classList.toggle('now', i === wi); c.classList.toggle('done', i < wi); });
+}
+function step(i) {
+  if (i >= WARM.length) { stopWarm(); return Voice.say('Разминка закончена. Можно играть!', { force:true }); }
+  wi = Math.max(0, i); left = WARM[wi][1]; paused = false; warmUI();
+  $('w' + wi).scrollIntoView({ behavior:'smooth', block:'nearest' });
+  Voice.say(`${WARM[wi][0]}. ${WARM[wi][2]}`, { force:true });
+}
+function startWarm() {
+  reader.stop();
+  if (navigator.wakeLock) navigator.wakeLock.request('screen').then(l => lock = l).catch(() => {});
+  let last = Date.now(), acc = 0;
+  ticking = setInterval(() => {
+    const now = Date.now(); if (!paused) acc += now - last; last = now;
+    while (acc >= 1000 && ticking) {
+      acc -= 1000; left--;
+      if (left === 3) Voice.say('Три, два, один', { force:true });
+      if (left <= 0) return step(wi + 1);
+      const c = $('clock'); if (c) { c.textContent = mmss(left); c.nextElementSibling.firstChild.style.width = (1 - left / WARM[wi][1]) * 100 + '%'; }
+    }
+  }, 250);
+  step(0);
+}
+function stopWarm(quiet) {
+  if (!ticking) return;
+  clearInterval(ticking); ticking = null; if (lock) { lock.release(); lock = null; }
+  if (!quiet) { Voice.stop(); render(); }
+}
+
+const reader = Reader({ bar:$('bar'), ids, text, el: id => $(id) });
+$('chips').onclick = e => { const b = e.target.closest('[data-f]'); if (b) { filter = b.dataset.f; history.replaceState(null, '', '#' + filter); reader.reset(); render(); } };
+$('list').onclick = e => { const sp = e.target.closest('[data-say]'); if (sp) { stopWarm(); reader.toggle(sp.dataset.say, sp); } };
+$('top').onclick = e => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.id === 'wgo') startWarm();
+  if (t.id === 'wpause') { paused = !paused; warmUI(); if (paused) Voice.stop(); }
+  if (t.id === 'wnext') step(wi + 1);
+  if (t.id === 'wprev') step(wi - 1);
+  if (t.id === 'wstop') stopWarm();
+};
+render();
+</script>
+</body>
+</html>

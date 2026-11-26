@@ -43,6 +43,9 @@
   .ch { padding:16px; }
   .ch b { font-size:20px; } .ch .lang { color:#7fd3ff; font-weight:800; font-size:15px; margin-left:8px; }
   .ch p { margin:6px 0 12px; font-size:17px; line-height:1.45; color:#d6e0f3; }
+  .ch .stars { color:var(--ball); font-size:22px; letter-spacing:2px; margin-top:6px; } .ch .stars i { color:rgba(255,255,255,.18); font-style:normal; }
+  .ch .who { color:#7fd3ff; font-weight:800; font-size:16px; margin-top:4px; }
+  .chint { color:var(--dim); font-size:17px; font-weight:700; margin:0 0 12px; }
   .ch .row { display:flex; gap:10px; flex-wrap:wrap; }
   .ch .row a, .ch .row button { flex:1 1 40%; padding:14px; font-size:17px; border-radius:14px; text-align:center; text-decoration:none; font-weight:800; }
   .ch .row a { color:var(--text); border:1px solid var(--line); background:rgba(255,255,255,.07); }
@@ -51,7 +54,7 @@
 <body>
 <nav class="top">
   <a class="logo" href="index.html"><span class="dot"></span>ПАДЕЛ</a>
-  <div class="tabs"><a href="rules.html"><span>📜</span>Правила</a><a href="score.html"><span>🎾</span>Счёт</a><a href="ref.html"><span>📚</span>Справка</a><a href="academy.html" class="on"><span>🎓</span>Академия</a><a href="tournament.html"><span>🏆</span>Турнир</a></div>
+  <div class="tabs"><a href="rules.html"><span>📜</span>Правила</a><a href="score.html"><span>🎾</span>Счёт</a><a href="ref.html"><span>📚</span>Справка</a><a href="academy.html" class="on"><span>🎓</span>Академия</a><a href="training.html"><span>🏃</span>Тренинг</a><a href="tournament.html"><span>🏆</span>Турнир</a></div>
 </nav>
 <main class="page" id="app"></main>
 
@@ -144,7 +147,7 @@ function shutUp() { sayTok++; talking = false; Voice.stop(); sayBtn(); }
 
 function render() {
   anim++;
-  const sec = `<div class="chips"><button data-sect="tests" class="${sect === 'tests' ? 'on' : ''}">🧠 Тесты</button><button data-sect="channels" class="${sect === 'channels' ? 'on' : ''}">📺 Каналы</button></div>`;
+  const sec = `<div class="chips"><button data-sect="tests" class="${sect === 'tests' ? 'on' : ''}">🧠 Тесты</button><button data-sect="channels" class="${sect === 'channels' ? 'on' : ''}">⭐ Источники</button></div>`;
   if (sect === 'channels') return app.innerHTML = sec + channels();
   const N = Q().length;
   const top = `${chips()}
@@ -197,8 +200,9 @@ function final() {
     <a class="big" href="ref.html">📚 В Справку →</a></div>`;
 }
 function channels() {
-  return CHANNELS.map(ch => `<article class="card ch"><b>${ch.name}</b><span class="lang">${ch.lang}</span><p>${ch.note}</p>
-    <div class="row"><a href="${ch.url}" target="_blank" rel="noopener">▶ Открыть</a>${ch.q ? `<button class="primary" data-set="${ch.q}">🧠 Тесты (${SETS[ch.q].q.length})</button>` : ''}</div></article>`).join('');
+  return `<p class="chint">Что смотреть и решать. Оценка — наша.</p>` + CHANNELS.map(ch => `<article class="card ch"><b>${ch.name}</b><span class="lang">${ch.lang}</span>
+    <div class="stars" aria-label="Оценка ${ch.rate} из 5">${'★'.repeat(ch.rate)}<i>${'★'.repeat(5 - ch.rate)}</i></div><div class="who">${ch.who}</div><p>${ch.note}</p>
+    <div class="row"><a href="${ch.url}" target="_blank" rel="noopener">↗ Открыть</a>${ch.q ? `<button class="primary" data-set="${ch.q}">🧠 Тесты (${SETS[ch.q].q.length})</button>` : ''}</div></article>`).join('');
 }
 
 function go(n) {

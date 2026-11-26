@@ -304,11 +304,18 @@ const SETS = {
   pd:   { name:'Padel Drive', q:PD },
   pp:   { name:'Просто Падел', q:PP },
 };
-// Каналы, которые разбираем: q — набор тестов (если уже есть)
+// Источники: прямая ссылка + наша оценка. rate — 1–5, who — кому полезно, q — набор тестов по нему (если есть)
 const CHANNELS = [
-  { name:'The Padel School', lang:'EN', url:'https://www.youtube.com/@ThePadelSchool', q:'tps', note:'Тактика и решения: бахада, бандеха, чикита, углы.' },
-  { name:'Никита Польщиков', lang:'RU', url:'https://www.youtube.com/channel/UCrT1LVH0BojxI84c1BYfsdg', q:'np', note:'Тренер на русском: тактика, защита, подача, ошибки новичков.' },
-  { name:'Padel Drive', lang:'EN', url:'https://www.youtube.com/@padeldriver', q:'pd', note:'Тактика по главам: подача, приём, первое воле, ошибки, укороченный.' },
-  { name:'Просто Падел', lang:'RU', url:'https://www.youtube.com/channel/UChvWeYjapYz-afKmJkLH-_w', q:'pp', note:'Разборы с тренером для новичков: подача, воле, стекло, свеча, бандеха.' },
-  { name:'Padel Chess', lang:'Facebook', url:'https://www.facebook.com/profile.php?id=61586022092935', note:'Нужен вход в Facebook — пришли посты или скриншоты, разберу.' },
+  { name:'Padel Drive', lang:'EN', rate:5, who:'Всем, кто уже играет', url:'https://www.youtube.com/@padeldriver', q:'pd',
+    note:'Лучшая тактика по полочкам: подача, приём, первое воле, типичные ошибки. Ролики разбиты на главы — удобно искать.' },
+  { name:'The Padel School', lang:'EN', rate:5, who:'Средний уровень', url:'https://www.youtube.com/@ThePadelSchool', q:'tps',
+    note:'Решения в розыгрыше: бахада, бандеха, чикита, углы. Коротко и по делу.' },
+  { name:'Padel Chess', lang:'EN', rate:4, who:'Проверить свою тактику', url:'https://www.padelchess.me/puzzles', 
+    note:'Тактические задачки на схеме корта, новая каждый день. Бесплатно в браузере; часть — по подписке.' },
+  { name:'Никита Польщиков', lang:'RU', rate:4, who:'Новичкам', url:'https://www.youtube.com/channel/UCrT1LVH0BojxI84c1BYfsdg', q:'np',
+    note:'Тренер на русском: тактика, защита, подача, ошибки новичков. Понятно, с главами.' },
+  { name:'Просто Падел', lang:'RU', rate:3, who:'Совсем новичкам', url:'https://www.youtube.com/channel/UChvWeYjapYz-afKmJkLH-_w', q:'pp',
+    note:'Разборы ударов с тренером — для старта. Остальное на канале — влоги с турниров.' },
+  { name:'Padel.ru — блог', lang:'RU', rate:3, who:'Новичкам', url:'https://padel.ru/blog/obuchenie/',
+    note:'Статьи про удары и правила. Смэш разобран хорошо, но кое-где неточности — сверяй с Правилами.' },
 ];
