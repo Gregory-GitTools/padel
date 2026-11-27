@@ -31,6 +31,13 @@
   .warm .ctl { display:flex; gap:10px; }
   .warm .ctl button { min-width:60px; padding:14px; font-size:18px; border-radius:14px; }
   .warm .ctl .grow { flex:1; }
+  .plans { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:4px 0 14px; }
+  .plans button { display:flex; flex-direction:column; align-items:flex-start; gap:6px; text-align:left; padding:14px; border-radius:16px; border:1px solid var(--line);
+    background:var(--card); color:var(--text); font:inherit; cursor:pointer; }
+  .plans button b { font-family:Unbounded, sans-serif; font-size:16px; line-height:1.25; }
+  .plans button span { color:var(--dim); font-size:15px; font-weight:800; }
+  .plans button.on { border-color:var(--ball); background:linear-gradient(135deg, rgba(215,242,5,.18), rgba(215,242,5,.04)); }
+  .plans button.on b { color:var(--ball); }
 </style>
 </head>
 <body>
@@ -41,7 +48,7 @@
 <main class="page">
   <section class="hero">
     <h1>Тренировка — <span>разминка и упражнения</span></h1>
-    <p>Разминка по таймеру с голосом. Упражнения по задачам — от простого к игре.</p>
+    <p>Разминка и готовые планы — по таймеру с голосом. Упражнения по задачам — от простого к игре.</p>
   </section>
   <div class="chips wrap" id="chips"></div>
   <div id="top"></div>
@@ -91,22 +98,48 @@ const DRILLS = [
   ['feet', 'Звезда', 5, 1, 1, 'Скорость на корте', 'Из центра у сетки к четырём точкам: два угла у сетки, два у заднего стекла. Каждый раз назад в центр.', 'Назад — боком, не спиной.'],
   ['feet', 'На одной верёвке', 10, 2, 2, 'Движение парой', 'Третий кричит «свеча» — оба отходите назад, «вперёд» — оба к сетке.', 'Двигаетесь вместе, расстояние не меняется.'],
 ];
-const GROUPS = { warm:'Разминка', serve:'Подача и приём', net:'У сетки', over:'Над головой', wall:'Стекло', def:'Защита', feet:'Ноги' };
+// Готовые планы: разминка целиком + упражнения по названию; ['Игра', мин, что делать] — свободная игра с заданием
+const PLANS = [
+  { name:'Первая тренировка', lvl:1, steps:['warm', 'Отскок и пояс', 'Просто верни', 'Ракетка перед грудью', 'Поймай отскок', 'Мини-падел'] },
+  { name:'60 минут у сетки', lvl:2, steps:['warm', 'Сплит-степ', 'Ракетка перед грудью', 'Мини-падел', 'Воле в ноги', 'Мяч в тело', 'Подал — к сетке'] },
+  { name:'Над головой и стекло', lvl:2, steps:['warm', 'Трофей', 'Бандеха с наброса', 'Поймай отскок', 'Бросок — удар', 'Бандеха или смэш?', 'Звезда'] },
+  { name:'Защита и выход к сетке', lvl:3, steps:['warm', 'Плоско и низко', 'Свеча — и вперёд', 'Чикита в ноги', 'Бахада', ['Игра', 5, 'Розыгрыши до 7 очков. Очко засчитывается, только если пара заняла сетку.']] },
+];
+// план → блоки (карточки) и шаги таймера: разминка — 11 шагов в одном блоке
+function planRun(pl) {
+  const blocks = [], run = [];
+  pl.steps.forEach(st => {
+    const b = blocks.length;
+    if (st === 'warm') { blocks.push({ name:'Разминка', sec:total, how:`${WARM.length} упражнений подряд, телефон подсказывает.` }); WARM.forEach(w => run.push({ name:w[0], sec:w[1], how:w[2], b })); return; }
+    if (Array.isArray(st)) { blocks.push({ name:st[0], sec:st[1] * 60, how:st[2] }); run.push({ name:st[0], sec:st[1] * 60, how:st[2], b }); return; }
+    const d = DRILLS.find(x => x[1] === st);
+    blocks.push({ name:d[1], sec:d[2] * 60, how:d[6], look:d[7], d });
+    run.push({ name:d[1], sec:d[2] * 60, how:`${d[6]} Смотри: ${d[7]}`, b });
+  });
+  return { blocks, run, min:Math.round(blocks.reduce((s, x) => s + x.sec, 0) / 60) };
+}
+const GROUPS = { warm:'Разминка', plan:'Планы', serve:'Подача и приём', net:'У сетки', over:'Над головой', wall:'Стекло', def:'Защита', feet:'Ноги' };
 const LVL = ['', 'новичок', 'средний', 'продвинутый'];
 const WHO = ['', '👤 один', '👥 с партнёром'];
 const $ = id => document.getElementById(id);
 const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 const durSay = s => s === 90 ? 'полторы минуты' : s < 60 ? s + ' секунд' : s === 60 ? 'минута' : s / 60 + ' минуты';
 const total = WARM.reduce((s, w) => s + w[1], 0);
-let filter = location.hash.slice(1) in GROUPS ? location.hash.slice(1) : 'warm';
+const hm = location.hash.match(/^#plan-(\d)$/);
+let filter = hm ? 'plan' : location.hash.slice(1) in GROUPS ? location.hash.slice(1) : 'warm', pi = hm ? Math.min(+hm[1], PLANS.length - 1) : 0;
+// что идёт по таймеру: разминка или выбранный план
+const warmRun = () => WARM.map((w, i) => ({ name:w[0], sec:w[1], how:w[2], b:i }));
+let RUN = warmRun();
 
-const ids = () => filter === 'warm' ? WARM.map((_, i) => 'w' + i) : DRILLS.map((d, i) => 'd' + i).filter(id => DRILLS[+id.slice(1)][0] === filter);
+const ids = () => filter === 'warm' ? WARM.map((_, i) => 'w' + i) : filter === 'plan' ? planRun(PLANS[pi]).blocks.map((_, i) => 'p' + i) : DRILLS.map((d, i) => 'd' + i).filter(id => DRILLS[+id.slice(1)][0] === filter);
 const text = id => {
   const i = +id.slice(1);
   if (id[0] === 'w') { const w = WARM[i]; return `${w[0]}. ${w[2]} ${durSay(w[1])}.`; }
+  if (id[0] === 'p') { const x = planRun(PLANS[pi]).blocks[i]; return `${x.name}. ${Math.round(x.sec / 60)} минут. ${x.how}${x.look ? ' Смотри: ' + x.look : ''}`; }
   const d = DRILLS[i]; return `${d[1]}. ${d[6]} Смотри: ${d[7]}`;
 };
 
+const srcLink = d => d[8] ? `<a class="src" href="https://youtu.be/${d[8]}${d[9] ? '?t=' + d[9] : ''}" target="_blank" rel="noopener">▶ ${VID[d[8]]}${d[9] ? ' · ' + mmss(d[9]) : ''}</a>` : '';
 function render() {
   reader.stop(); stopWarm(true);
   $('chips').innerHTML = Object.entries(GROUPS).map(([k, n]) => `<button class="${filter === k ? 'on' : ''}" data-f="${k}">${n}</button>`).join('');
@@ -116,12 +149,24 @@ function render() {
       <button class="primary big" id="wgo">▶ Начать разминку</button></div>`;
     WARM.forEach((w, i) => { h += `<article class="card" id="w${i}"><span class="n">${i + 1}</span><div><b>${w[0]}</b><div class="meta"><span>⏱ ${mmss(w[1])}</span></div><p>${w[2]}</p></div>
       <button class="spk" data-say="w${i}" aria-label="Озвучить">🔊</button></article>`; });
+  } else if (filter === 'plan') {
+    const P = planRun(PLANS[pi]);
+    $('top').innerHTML = `<div class="plans">${PLANS.map((p, i) => `<button class="${i === pi ? 'on' : ''}" data-p="${i}"><b>${p.name}</b><span>${planRun(p).min} мин · ${LVL[p.lvl]}</span></button>`).join('')}</div>
+      <div class="warm" id="warm"><p class="goal">${P.blocks.length} блоков · ${P.min} мин. Телефон ведёт по таймеру и говорит, что делать.</p>
+      <button class="primary big" id="wgo">▶ Начать план</button></div>`;
+    P.blocks.forEach((x, i) => {
+      const d = x.d;
+      h += `<article class="card" id="p${i}"><span class="n">${i + 1}</span><div><b>${x.name}</b>
+        <div class="meta">${d ? `<span class="l${d[4]}">${LVL[d[4]]}</span>` : ''}<span>⏱ ${Math.round(x.sec / 60)} мин</span>${d ? `<span>${WHO[d[3]]}</span>` : ''}</div>
+        <p>${x.how}</p>${x.look ? `<p class="look">👁 ${x.look}</p>` : ''}${d ? srcLink(d) : ''}</div>
+        <button class="spk" data-say="p${i}" aria-label="Озвучить">🔊</button></article>`;
+    });
   } else {
     const n = ids().length;
     $('top').innerHTML = `<p class="goal">${n} упражнения — от простого к игровому. Делай по порядку.</p>`;
     ids().forEach((id, k) => {
       const d = DRILLS[+id.slice(1)];
-      const src = d[8] ? `<a class="src" href="https://youtu.be/${d[8]}${d[9] ? '?t=' + d[9] : ''}" target="_blank" rel="noopener">▶ ${VID[d[8]]}${d[9] ? ' · ' + mmss(d[9]) : ''}</a>` : '';
+      const src = srcLink(d);
       h += `<article class="card" id="${id}"><span class="n">${k + 1}</span><div><b>${d[1]}</b>
         <div class="meta"><span class="l${d[4]}">${LVL[d[4]]}</span><span>⏱ ${d[2]} мин</span><span>${WHO[d[3]]}</span></div>
         <p><b style="display:inline;font-size:17px">${d[5]}.</b> ${d[6]}</p><p class="look">👁 ${d[7]}</p>${src}</div>
@@ -134,21 +179,22 @@ function render() {
 // разминка по таймеру: голос объявляет упражнение, часы считают, в конце — следующее
 let wi = 0, left = 0, ticking = null, paused = false, lock = null;
 function warmUI() {
-  const w = WARM[wi];
-  $('warm').innerHTML = `<div class="step">Упражнение ${wi + 1} из ${WARM.length}</div><h2>${w[0]}</h2><p class="how">${w[2]}</p>
-    <div class="clock" id="clock">${mmss(left)}</div><div class="prog"><i style="width:${(1 - left / w[1]) * 100}%"></i></div>
+  const w = RUN[wi];
+  $('warm').innerHTML = `<div class="step">Шаг ${wi + 1} из ${RUN.length}</div><h2>${w.name}</h2><p class="how">${w.how}</p>
+    <div class="clock" id="clock">${mmss(left)}</div><div class="prog"><i style="width:${(1 - left / w.sec) * 100}%"></i></div>
     <div class="ctl"><button id="wprev" aria-label="Предыдущее">${CHEV(-1)}</button><button class="primary grow" id="wpause">${paused ? '▶ Дальше' : '❚❚ Пауза'}</button>
     <button id="wnext" aria-label="Следующее">${CHEV(1)}</button><button id="wstop" aria-label="Закончить">■</button></div>`;
-  document.querySelectorAll('#list .card').forEach((c, i) => { c.classList.toggle('now', i === wi); c.classList.toggle('done', i < wi); });
+  document.querySelectorAll('#list .card').forEach((c, i) => { c.classList.toggle('now', i === w.b); c.classList.toggle('done', i < w.b); });
 }
 function step(i) {
-  if (i >= WARM.length) { stopWarm(); return Voice.say('Разминка закончена. Можно играть!', { force:true }); }
-  wi = Math.max(0, i); left = WARM[wi][1]; paused = false; warmUI();
-  $('w' + wi).scrollIntoView({ behavior:'smooth', block:'nearest' });
-  Voice.say(`${WARM[wi][0]}. ${WARM[wi][2]}`, { force:true });
+  if (i >= RUN.length) { stopWarm(); return Voice.say(filter === 'plan' ? 'Тренировка закончена. Молодцы!' : 'Разминка закончена. Можно играть!', { force:true }); }
+  wi = Math.max(0, i); left = RUN[wi].sec; paused = false; warmUI();
+  const card = document.querySelectorAll('#list .card')[RUN[wi].b]; if (card) card.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  Voice.say(`${RUN[wi].name}. ${RUN[wi].how}`, { force:true });
 }
 function startWarm() {
   reader.stop();
+  RUN = filter === 'plan' ? planRun(PLANS[pi]).run : warmRun(); wi = 0;
   if (navigator.wakeLock) navigator.wakeLock.request('screen').then(l => lock = l).catch(() => {});
   let last = Date.now(), acc = 0;
   ticking = setInterval(() => {
@@ -157,7 +203,7 @@ function startWarm() {
       acc -= 1000; left--;
       if (left === 3) Voice.say('Три, два, один', { force:true });
       if (left <= 0) return step(wi + 1);
-      const c = $('clock'); if (c) { c.textContent = mmss(left); c.nextElementSibling.firstChild.style.width = (1 - left / WARM[wi][1]) * 100 + '%'; }
+      const c = $('clock'); if (c) { c.textContent = mmss(left); c.nextElementSibling.firstChild.style.width = (1 - left / RUN[wi].sec) * 100 + '%'; }
     }
   }, 250);
   step(0);
@@ -173,6 +219,7 @@ $('chips').onclick = e => { const b = e.target.closest('[data-f]'); if (b) { fil
 $('list').onclick = e => { const sp = e.target.closest('[data-say]'); if (sp) { stopWarm(); reader.toggle(sp.dataset.say, sp); } };
 $('top').onclick = e => {
   const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.p) { pi = +t.dataset.p; history.replaceState(null, '', '#plan-' + pi); reader.reset(); return render(); }
   if (t.id === 'wgo') startWarm();
   if (t.id === 'wpause') { paused = !paused; warmUI(); if (paused) Voice.stop(); }
   if (t.id === 'wnext') step(wi + 1);
