@@ -45,6 +45,14 @@
   .ch p { margin:6px 0 12px; font-size:17px; line-height:1.45; color:#d6e0f3; }
   .ch .stars { color:var(--ball); font-size:22px; letter-spacing:2px; margin-top:6px; } .ch .stars i { color:rgba(255,255,255,.18); font-style:normal; }
   .ch .who { color:#7fd3ff; font-weight:800; font-size:16px; margin-top:4px; }
+  .ch .vids { margin-top:12px; border-top:1px solid var(--line); padding-top:6px; }
+  .ch .vids summary { cursor:pointer; padding:12px 0; font-size:18px; font-weight:800; color:var(--text); list-style:none; }
+  .ch .vids summary::after { content:' ▾'; color:var(--dim); } .ch .vids[open] summary::after { content:' ▴'; }
+  .ch .vids a { display:flex; align-items:center; gap:12px; padding:12px 4px; color:var(--text); text-decoration:none; font-size:17px; font-weight:700;
+    line-height:1.35; border-top:1px solid rgba(255,255,255,.06); }
+  .ch .vids a::before { content:'▶'; flex:none; display:grid; place-items:center; width:44px; height:44px; border-radius:50%; background:rgba(215,242,5,.14); color:var(--ball); font-size:17px; }
+  .ch .vids a.seen::before { content:'✓'; background:rgba(127,211,255,.14); color:#7fd3ff; }
+  .ch .vids a small { margin-left:auto; flex:none; color:var(--dim); font-size:15px; }
   .chint { color:var(--dim); font-size:17px; font-weight:700; margin:0 0 12px; }
   .ch .row { display:flex; gap:10px; flex-wrap:wrap; }
   .ch .row a, .ch .row button { flex:1 1 40%; padding:14px; font-size:17px; border-radius:14px; text-align:center; text-decoration:none; font-weight:800; }
@@ -54,7 +62,7 @@
 <body>
 <nav class="top">
   <a class="logo" href="index.html"><span class="dot"></span>ПАДЕЛ</a>
-  <div class="tabs"><a href="rules.html"><span>📜</span>Правила</a><a href="score.html"><span>🎾</span>Счёт</a><a href="ref.html"><span>📚</span>Справка</a><a href="academy.html" class="on"><span>🎓</span>Академия</a><a href="training.html"><span>🏃</span>Тренинг</a><a href="tournament.html"><span>🏆</span>Турнир</a></div><script src="menu.js" defer></script>
+  <div class="tabs"><a href="rules.html"><span>📜</span>Правила</a><a href="score.html"><span>🎾</span>Счёт</a><a href="ref.html"><span>📚</span>Справка</a><a href="academy.html" class="on"><span>🎓</span>Академия</a><a href="training.html"><span>🏃</span>Тренинг</a><a href="tournament.html"><span>🏆</span>Турнир</a></div><script src="menu.js" defer></script><script src="player.js" defer></script>
 </nav>
 <main class="page" id="app"></main>
 
@@ -199,10 +207,29 @@ function final() {
     <button class="big" id="again">↺ Пройти заново</button>
     <a class="big" href="ref.html">📚 В Справку →</a></div>`;
 }
+// закрыли плеер — обновить отметки «просмотрено», раскрытые списки остаются раскрытыми
+function reVids() {
+  if (sect !== 'channels') return;
+  const open = [...app.querySelectorAll('.vids')].map(d => d.open);
+  render();
+  app.querySelectorAll('.vids').forEach((d, i) => { d.open = open[i]; });
+}
+addEventListener('padel-video', reVids);
+addEventListener('DOMContentLoaded', reVids); // плеер грузится после страницы
 function channels() {
   return `<p class="chint">Что смотреть и решать. Оценка — наша.</p>` + CHANNELS.map(ch => `<article class="card ch"><b>${ch.name}</b><span class="lang">${ch.lang}</span>
     <div class="stars" aria-label="Оценка ${ch.rate} из 5">${'★'.repeat(ch.rate)}<i>${'★'.repeat(5 - ch.rate)}</i></div><div class="who">${ch.who}</div><p>${ch.note}</p>
-    <div class="row"><a href="${ch.url}" target="_blank" rel="noopener">↗ Открыть</a>${ch.q ? `<button class="primary" data-set="${ch.q}">🧠 Тесты (${SETS[ch.q].q.length})</button>` : ''}</div></article>`).join('');
+    <div class="row"><a href="${ch.url}" target="_blank" rel="noopener">↗ Открыть</a>${ch.q ? `<button class="primary" data-set="${ch.q}">🧠 Тесты (${SETS[ch.q].q.length})</button>` : ''}</div>${vidList(ch.q)}</article>`).join('');
+}
+// ролики канала, что мы разобрали, — открываются в своём плеере; просмотренные — с отметкой, где остановился
+function vidList(q) {
+  const ids = q ? Object.keys(VID).filter(k => VCH[k] === q) : [];
+  if (!ids.length) return '';
+  const seen = window.Player ? Object.fromEntries(Player.recent().map(v => [v.id, v])) : {};
+  return `<details class="vids"><summary>🎬 Видео (${ids.length})</summary>${ids.map(id => {
+    const v = seen[id];
+    return `<a href="https://youtu.be/${id}" data-title="${VID[id]}"${v ? ' class="seen"' : ''}>${VID[id]}${v && v.t ? `<small>${Player.mmss(v.t)}</small>` : ''}</a>`;
+  }).join('')}</details>`;
 }
 
 function go(n) {

@@ -57,6 +57,7 @@
   footer { text-align:center; font-size:13px; opacity:.7; padding:20px; }
 </style>
 <link rel="stylesheet" href="menu.css">
+<link rel="stylesheet" href="player.css">
 </head>
 <body>
 <header>
@@ -389,5 +390,6 @@ document.getElementById('tacticsGrid').innerHTML = TACTICS.map(t =>
   `<div class="tactic"><h3>${t.t}</h3><svg viewBox="0 0 420 230">${courtTop(t.s)}</svg><p>${t.p}</p></div>`).join('');
 </script>
 <script src="menu.js" defer></script>
+<script src="player.js" defer></script>
 </body>
 </html>

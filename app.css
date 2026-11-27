@@ -1,6 +1,7 @@
 /* Общий стиль счётчика и турниров: «ночной корт» */
 @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@500;700;800&display=swap');
 @import url('menu.css');
+@import url('player.css');
 
 :root {
   --bg:#08111f; --bg2:#0e1c33; --card:rgba(255,255,255,.06); --line:rgba(255,255,255,.13);

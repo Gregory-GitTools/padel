@@ -19,14 +19,20 @@
   .tile.wide .i { font-size:52px; }
   .tile.hot { border-color:var(--ball); background:linear-gradient(135deg, rgba(215,242,5,.16), rgba(215,242,5,.03)); }
   .tile.hot b { color:var(--ball); }
-  .cont { margin:0 0 14px; }
+  .cont { margin:0 0 14px; } .cont[hidden], .vrec[hidden] { display:none; }
+  .vrec { margin:0 0 14px; } .vrec h2 { margin:0 0 8px; }
+  .vrec a { display:flex; align-items:center; gap:14px; padding:12px 14px; margin-bottom:8px; border-radius:18px; border:1px solid var(--line);
+    background:var(--card); color:var(--text); text-decoration:none; font-size:17px; font-weight:700; line-height:1.3; }
+  .vrec a::before { content:'▶'; flex:none; display:grid; place-items:center; width:52px; height:52px; border-radius:50%; background:var(--ball); color:#0b1426; font-size:22px; }
+  .vrec a span { flex:1; } .vrec a small { display:block; color:var(--dim); font-size:15px; margin-top:4px; }
+  .vrec .bar { height:5px; border-radius:5px; background:rgba(255,255,255,.1); margin-top:8px; overflow:hidden; } .vrec .bar i { display:block; height:100%; background:var(--ball); }
   @media (max-width:360px){ .tiles { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
 <nav class="top">
   <a class="logo" href="index.html"><span class="dot"></span>ПАДЕЛ</a>
-  <div class="tabs"><a href="rules.html"><span>📜</span>Правила</a><a href="score.html"><span>🎾</span>Счёт</a><a href="ref.html"><span>📚</span>Справка</a><a href="academy.html"><span>🎓</span>Академия</a><a href="training.html"><span>🏃</span>Тренинг</a><a href="tournament.html"><span>🏆</span>Турнир</a></div><script src="menu.js" defer></script>
+  <div class="tabs"><a href="rules.html"><span>📜</span>Правила</a><a href="score.html"><span>🎾</span>Счёт</a><a href="ref.html"><span>📚</span>Справка</a><a href="academy.html"><span>🎓</span>Академия</a><a href="training.html"><span>🏃</span>Тренинг</a><a href="tournament.html"><span>🏆</span>Турнир</a></div><script src="menu.js" defer></script><script src="player.js" defer></script>
 </nav>
 <main class="page">
   <section class="hero">
@@ -34,6 +40,7 @@
     <p>Правила, удары, тесты на тактику, счёт и турниры. С озвучкой.</p>
   </section>
   <a class="tile wide hot cont" id="cont" href="academy.html" hidden></a>
+  <section class="vrec" id="vrec" hidden></section>
   <div class="tiles">
     <a class="tile" href="rules.html"><span class="i">📜</span><b>Правила</b><span>Коротко, по карточке</span></a>
     <a class="tile" href="score.html"><span class="i">🎾</span><b>Счёт</b><span>Счётчик матча голосом</span></a>
@@ -58,6 +65,16 @@ if (last) {
     c.innerHTML = `<span class="i">▶</span><span><b>Продолжить тест</b><br><span>${SETS[st.last].name} — ${done} из ${n}</span></span>`;
   }
 }
+// видео, что начал смотреть, — продолжить с того же места (хранится в телефоне 30 дней)
+function vrec() {
+  const box = document.getElementById('vrec');
+  const list = window.Player ? Player.recent().filter(v => v.t > 5 && !(v.dur && v.t > v.dur - 10)).slice(0, 3) : [];
+  box.hidden = !list.length;
+  box.innerHTML = list.length ? `<h2 class="sec">Продолжить смотреть</h2>` + list.map(v =>
+    `<a href="https://youtu.be/${v.id}?t=${v.t}" data-title="${v.title}"><span>${v.title}<small>с ${Player.mmss(v.t)}${v.dur ? ' из ' + Player.mmss(v.dur) : ''}</small>${v.dur ? `<div class="bar"><i style="width:${Math.round(100 * v.t / v.dur)}%"></i></div>` : ''}</span></a>`).join('') : '';
+}
+addEventListener('DOMContentLoaded', vrec);
+addEventListener('padel-video', vrec);
 </script>
 </body>
 </html>

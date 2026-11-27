@@ -63,6 +63,10 @@ const VID = {
   KD0ORtRw4x8:'How Pros Handle Lobbing', '7CqmDPh5lYY':'How Pros Play Chiquitas', DtunsOqRbVk:'5 Hacks to Finish More Points',
   '45FaHNUxKWs':'Finish Points: 3 Tips', '77VVlM7aVZc':'How Pros Deal With Corners', '_tHe1NCuH70':'Padel Tactics Every Player Gets Wrong',
 };
+// чей ролик — ключ набора в CHANNELS (q): по нему Источники показывают видео канала
+const VCH = {};
+for (const k in VID) VCH[k] = 'tps';
+function vids(ch, o) { for (const k in o) { VID[k] = o[k]; VCH[k] = ch; } }
 const TPS = [
   { k:'Что играть?', src:'q14sq5ky1f0', q:'Тебя перекинули свечой. Мяч отскочил от заднего стекла высоко и далеко от него.',
     p:{ y:[110,352], m:[150,300], a:[60,150], b:[140,150] }, ball:[76,340],
@@ -117,7 +121,7 @@ const TPS = [
 ];
 
 // Ситуации по роликам Никиты Польщикова (youtube.com/channel/UCrT1LVH0BojxI84c1BYfsdg); t — секунда главы в ролике.
-Object.assign(VID, {
+vids('np', {
   'n1If9Jam-z8':'Тактика падела: как играть умнее соперника', '8oSC-FpzrQk':'ТОП-7 ошибок новичков в паделе',
   B5Jg0VhkYD0:'ТОП-6 советов для быстрого прогресса', '1g4mIlF-XDM':'Как правильно защищаться в паделе',
   BCFZByCHZnA:'ТОП-3 удара, которые выигрывают 80% розыгрышей', 'lOhy-DGT7h0':'Как улучшить игру в падел',
@@ -188,7 +192,7 @@ const NP = [
 ];
 
 // Ситуации по роликам Padel Drive (youtube.com/@padeldriver); t — секунда главы в ролике.
-Object.assign(VID, {
+vids('pd', {
   mss17lKddCI:'5 ошибок, которых 80% игроков не замечают', P4iDbIIaye8:'3 удара, которые выигрывают 70% очков',
   rXUYiZkS5E0:'5 правил, которые я хотел бы знать с самого начала', NfJiVCir0B4:'Контрапаред: когда играть',
   dLH6SsNeK7I:'Укороченный удар, который никто не играет', '8WXlT6bOGZY':'5 простых советов для быстрого прогресса',
@@ -257,7 +261,7 @@ const PD = [
            { t:'Аккуратная свеча', g:0, d:'M86 238 L100 20', h:1.6, r:'Отдаёшь сетку на лёгком мяче.' } ] },
 ];
 // Ситуации по роликам «Просто Падел» (youtube.com/channel/UChvWeYjapYz-afKmJkLH-_w); глав в роликах нет.
-Object.assign(VID, {
+vids('pp', {
   I0ARR_SkTuk:'Подача в паделе: 90% новичков не понимают этих нюансов', EUY9Xom8OGw:'Волей в паделе: перестань делать эту ошибку',
   'UyfCtjb-YXc':'Боишься стекла? Игра от задней и боковой стенки', DhOYYT1D108:'Свеча в паделе: почему лоб становится подарком',
   fFC5aPBGKqU:'Почему не получается бандеха? Разбор от А до Я', w2fdzkhQCYI:'Бэкхенд в паделе: как научиться бить слева',
