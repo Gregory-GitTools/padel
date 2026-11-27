@@ -20,7 +20,9 @@ html.drum-open { overflow:hidden; }
 .dbtn.on { background:#d7f205; border-color:#d7f205; box-shadow:0 0 22px rgba(215,242,5,.55); }
 /* подпись с номером — слева от кнопки, крутится вместе с ней; номер у самой кнопки */
 .dlabel { position:absolute; top:50%; right:calc(100% + 16px); transform:translateY(-50%); white-space:nowrap; pointer-events:none;
-  color:#eef3ff; font-family:Unbounded, sans-serif; font-weight:700; font-size:22px; text-shadow:0 0 3px #000, 0 0 6px #000; }
+  color:#eef3ff; font-family:Unbounded, sans-serif; font-weight:700; font-size:22px; text-shadow:0 0 3px #000, 0 0 6px #000;
+  transition:opacity .4s; }
+.drum.quiet .dlabel { opacity:0; }
 .dlabel[data-num]::after { content:attr(data-num); margin-left:10px; font-family:Manrope, sans-serif; font-size:17px; font-weight:800;
   color:#9fb0cc; font-variant-numeric:tabular-nums; }
 body.boardOnly .dtoggle { display:none; }

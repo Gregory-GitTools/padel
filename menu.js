@@ -1,14 +1,15 @@
 // Меню-барабан, как в Atlas (core/layers-panel.js → rotor): кнопка ☰ справа вверху открывает барабан разделов.
 // Кнопки по дуге, как в игровом автомате: в центре крупно, к краям темнее и прозрачнее, по кругу.
 // Крутится пальцем по всему экрану или колёсиком мыши; встаёт ближайшей кнопкой в центр.
-// Нажал кнопку — она докручивается в центр и открывает раздел. Подписи с номером — всегда видны.
+// Нажал кнопку — она докручивается в центр и открывает раздел. Подписи с номером видны 2 с после открытия
+// и после каждой прокрутки, потом гаснут — не наезжают друг на друга у краёв.
 (() => {
   const NAV = [
     ['index.html', '🏠', 'Главная'], ['rules.html', '📜', 'Правила'], ['score.html', '🎾', 'Счёт'],
     ['ref.html', '📚', 'Справка'], ['academy.html', '🎓', 'Академия'], ['training.html', '🏃', 'Тренинг'],
     ['tournament.html', '🏆', 'Турнир'], ['comic.html', '💬', 'Комикс'],
   ];
-  const BTN = 64, GAP = 78, DETENT = 0.7;
+  const BTN = 64, GAP = 78, DETENT = 0.7, LABEL_MS = 2000;
   const here = location.pathname.split('/').pop() || 'index.html';
   const cur = Math.max(0, NAV.findIndex(([h]) => h === here));
 
@@ -50,8 +51,17 @@
   // высота, в которую встают все кнопки без повторов
   const need = () => { const step = Math.PI / 2 / (n / 2 + 0.5); return 2 * Math.min(GAP / Math.sin(step), 400) + BTN + 8; };
 
+  // подписи: показать и погасить через 2 с покоя
+  let quietTimer = 0;
+  const wake = () => {
+    box.classList.remove('quiet');
+    clearTimeout(quietTimer);
+    quietTimer = setTimeout(() => box.classList.add('quiet'), LABEL_MS);
+  };
+
   function layout() {
     if (shade.hidden) return;
+    wake();
     const cy = box.clientHeight / 2, { radius, step } = geom();
     const off = shownAt(raw);
     cells.forEach((cell, i) => {
@@ -179,5 +189,5 @@
   // вернулись кнопкой «Назад» — меню закрыто
   addEventListener('pageshow', () => { shade.hidden = true; shade.classList.remove('show'); box.classList.add('closed'); toggle.classList.remove('open'); document.documentElement.classList.remove('drum-open'); });
 
-  window.Drum = { open, close, spinTo, centerIndex, cells, cur };
+  window.Drum = { open, close, spinTo, centerIndex, cells, cur, LABEL_MS };
 })();
